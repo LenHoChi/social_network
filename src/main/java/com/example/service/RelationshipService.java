@@ -13,4 +13,6 @@ public interface RelationshipService {
     Boolean beFriends(String userEmail, String friendEmail);
     List<String> getFriendList(String email);
     List<String> getCommonFriendList(List<String> emailList);
+    boolean beSubciber(String email_requestor, String email_target);
+
 }

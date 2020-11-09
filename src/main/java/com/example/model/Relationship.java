@@ -18,4 +18,6 @@ public class Relationship{
     private RelationshipPK relationshipPK;
     @Column(name = "arefriends")
     private Boolean areFriends;
+    @Column(name = "issubcriber")
+    private Boolean isSubcriber;
 }

@@ -38,4 +38,8 @@ public class RelationshipController {
     public List<String> getCommonFriendList(@Valid @RequestBody List<String> emails){
         return relationshipService.getCommonFriendList(emails);
     }
+    @PostMapping("relationship/beSubcriber")
+    public Boolean beSubcriber(@Valid @RequestBody RelationshipPK relationshipPK){
+        return relationshipService.beSubciber(relationshipPK.getUserEmail(),relationshipPK.getFriendEmail());
+    }
 }

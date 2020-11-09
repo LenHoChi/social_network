@@ -23,11 +23,11 @@ public class UserController {
         return userService.saveUser(users);
     }
     @DeleteMapping("/users/{id}")
-    public Map<String, Boolean> deleteUser(@PathVariable(value = "id") Integer id){
+    public Map<String, Boolean> deleteUser(@PathVariable(value = "id") String id){
         return userService.deleteUser(id);
     }
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable(value = "id") Integer id){
+    public User getUserById(@PathVariable(value = "id") String id){
         return userService.getUserById(id).get();
     }
     @PutMapping("/users/{id}")

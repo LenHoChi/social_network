@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(Integer id) {
+    public Optional<User> getUserById(String id) {
         return usersRepository.findById(id);
     }
 
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Boolean> deleteUser(Integer userId) {
+    public Map<String, Boolean> deleteUser(String userId) {
         User users = usersRepository.findById(userId).get();
         usersRepository.delete(users);
         Map<String, Boolean> response = new HashMap<>();
