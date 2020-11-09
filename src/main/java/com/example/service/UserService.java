@@ -1,14 +1,15 @@
 package com.example.service;
 
-import com.example.model.Friends;
-import com.example.model.Users;
+import com.example.model.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface UserService {
-    List<Users> getAllUsers();
-    Users saveUser(Users users);
-    Users updateUser(Users users, Integer id);
+    List<User> getAllUsers();
+    Optional<User> getUserById(Integer id);
+    User saveUser(User users);
+    User updateUser(User users, Integer id);
     Map<String, Boolean> deleteUser(Integer userId);
 }
