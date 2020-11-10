@@ -14,24 +14,24 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+
     @GetMapping("/users")
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
+
     @PostMapping("/users")
-    public User createUser(@Valid @RequestBody User users){
+    public User createUser(@Valid @RequestBody User users) {
         return userService.saveUser(users);
     }
+
     @DeleteMapping("/users/{id}")
-    public Map<String, Boolean> deleteUser(@PathVariable(value = "id") String id){
+    public Map<String, Boolean> deleteUser(@PathVariable(value = "id") String id) {
         return userService.deleteUser(id);
     }
+
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable(value = "id") String id){
+    public User getUserById(@PathVariable(value = "id") String id) {
         return userService.getUserById(id).get();
-    }
-    @PutMapping("/users/{id}")
-    public User updateUser(@PathVariable(value = "id") Integer id, @Valid @RequestBody User users){
-        return userService.updateUser(users,id);
     }
 }

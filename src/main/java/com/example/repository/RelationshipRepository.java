@@ -24,4 +24,12 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Rela
             + "group by r.relationshipPK.friendEmail "
             + "having count(r.relationshipPK.friendEmail) > 1 ")
     List<String> getCommonFriendList(@Param("email") List<String> email);
+
+    @Query("SELECT r.relationshipPK.friendEmail "
+            + "FROM Relationship r "
+            + "where r.relationshipPK.userEmail = :email "
+            + "and r.areFriends = true "
+            + "or r.isSubcriber = true "
+            + "and r.isBlock = false")
+    List<String> getReceiveUpdatesList(@Param("email") String email);
 }
