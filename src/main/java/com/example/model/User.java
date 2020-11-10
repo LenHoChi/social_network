@@ -15,6 +15,6 @@ import javax.validation.constraints.Email;
 public class User {
     @Id
     @Column(name = "email")
-    @Email(message = "ho chi len")
+//    @Email(message = "ho chi len")
     private String email;
 }
