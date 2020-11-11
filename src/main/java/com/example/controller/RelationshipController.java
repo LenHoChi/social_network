@@ -1,14 +1,13 @@
 package com.example.controller;
 
+import com.example.dto.RelationshipDTO;
 import com.example.exception.RelationshipException;
-import com.example.model.Relationship;
 import com.example.model.RelationshipPK;
 import com.example.service.RelationshipService;
 import com.example.utils.request.RequestFriends;
 import com.example.utils.request.RequestFriendsList;
 import com.example.utils.request.RequestReciveUpdate;
 import com.example.utils.request.RequestSubcriber;
-import com.example.utils.response.ResponseFriends;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -26,13 +26,13 @@ public class RelationshipController {
     private RelationshipService relationshipService;
 
     @GetMapping("/relationship")
-    public List<Relationship> getAllRelationships() {
+    public List<RelationshipDTO> getAllRelationships() {
         return relationshipService.getAllRelationships();
     }
-
+    //{ "userEmail": "len2", "friendEmail": "len6" }
     @PostMapping("/relationship/getRelationshipbyId")
-    public Relationship getRelationshipById(@Valid @RequestBody RelationshipPK relationshipPK) {
-        return relationshipService.getRelationshipById(relationshipPK).get();
+    public Optional<RelationshipDTO> getRelationshipById(@Valid @RequestBody RelationshipPK relationshipPK) {
+        return relationshipService.getRelationshipById(relationshipPK);
     }
 
     //Cau1

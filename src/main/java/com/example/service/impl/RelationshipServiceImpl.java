@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.example.dto.RelationshipDTO;
 import com.example.exception.RelationshipException;
 import com.example.exception.ResouceNotFoundException;
 import com.example.model.Relationship;
@@ -7,12 +8,12 @@ import com.example.model.RelationshipPK;
 import com.example.repository.RelationshipRepository;
 import com.example.repository.UserRepository;
 import com.example.service.RelationshipService;
+import com.example.utils.convert.RelationshipConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,15 +22,15 @@ public class RelationshipServiceImpl implements RelationshipService {
     RelationshipRepository relationshipRepository;
     @Autowired
     UserRepository userRepository;
-
+    RelationshipConvert relationshipConvert;
     @Override
-    public Optional<Relationship> getRelationshipById(RelationshipPK relationshipPK) {
-        return relationshipRepository.findById(relationshipPK);
+    public Optional<RelationshipDTO> getRelationshipById(RelationshipPK relationshipPK) {
+        return Optional.ofNullable(relationshipConvert.modelToDTO(relationshipRepository.findById(relationshipPK).get()));
     }
 
     @Override
-    public List<Relationship> getAllRelationships() {
-        return relationshipRepository.findAll();
+    public List<RelationshipDTO> getAllRelationships() {
+        return relationshipConvert.listModelToListDTO(relationshipRepository.findAll());
     }
 
     @Override

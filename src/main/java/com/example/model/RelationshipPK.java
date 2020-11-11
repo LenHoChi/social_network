@@ -1,11 +1,12 @@
 package com.example.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.Email;
 import java.io.Serializable;
 
@@ -13,11 +14,16 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
+//@RequiredArgsConstructor
 public class RelationshipPK implements Serializable {
 //    @Email
+//    @NonNull
     @Column(name = "user_email")
     private String userEmail;
 //    @Email
+//    @NonNull
     @Column(name = "friend_email")
     private String friendEmail;
+
+
 }

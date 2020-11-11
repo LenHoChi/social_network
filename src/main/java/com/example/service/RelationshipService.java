@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.dto.RelationshipDTO;
 import com.example.exception.RelationshipException;
 import com.example.model.Relationship;
 import com.example.model.RelationshipPK;
@@ -9,9 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface RelationshipService {
-    Optional<Relationship> getRelationshipById(RelationshipPK relationshipPK);
+    Optional<RelationshipDTO> getRelationshipById(RelationshipPK relationshipPK);
 
-    List<Relationship> getAllRelationships();
+    List<RelationshipDTO> getAllRelationships();
 
     Boolean beFriends(String userEmail, String friendEmail) throws RelationshipException;
 

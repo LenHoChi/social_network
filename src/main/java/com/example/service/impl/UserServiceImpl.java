@@ -1,8 +1,10 @@
 package com.example.service.impl;
 
+import com.example.dto.UserDTO;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.service.UserService;
+import com.example.utils.convert.UserConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +17,20 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository usersRepository;
-
+    UserConvert userConvert;
     @Override
-    public List<User> getAllUsers() {
-        return usersRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        return userConvert.listModelToListDTO(usersRepository.findAll());
     }
 
     @Override
-    public Optional<User> getUserById(String id) {
-        return usersRepository.findById(id);
+    public Optional<UserDTO> getUserById(String id) {
+        return Optional.ofNullable(userConvert.modelToDTO(usersRepository.findById(id).get()));
     }
 
     @Override
-    public User saveUser(User users) {
-        return usersRepository.save(users);
+    public UserDTO saveUser(UserDTO userDTO) {
+        return userConvert.modelToDTO(usersRepository.save(userConvert.DTOToModel(userDTO)));
     }
 
     @Override
