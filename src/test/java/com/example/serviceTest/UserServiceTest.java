@@ -26,21 +26,34 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
+//@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserServiceTest {
-    @Mock
+//    cach 1
+//    @Mock
+//    private UserRepository userRepository;
+    //cach 2
+    @MockBean
     private UserRepository userRepository;
 
-    @InjectMocks
-    //@Autowired
+    //@InjectMocks --->cach 1
+    //cach 2 (use like below)
+    @Autowired
     private UserServiceImpl userServiceImpl;
-    UserConvert userConvert;
-//    @Before
-//    public void setUp() throws Exception {
-//        MockitoAnnotations.initMocks(this);
-//    }
+
+    private UserConvert userConvert;
+    //cach 1 ---> test voi Mockito
+    //dung @runwith(mockito..) thi ko dung cai nay nua
+    //    @Before
+    //    public void setUp() throws Exception {
+    //        MockitoAnnotations.initMocks(this);
+    //    }
+    //https://loda.me/test-huong-dan-toan-tap-mockito-loda1576641016810/
+
+    //cach 2 ---> test voi @MockBean
+    //https://kipalog.com/posts/Spring-Boot--18--Hu-o--ng-da--n-chi-tie--t-Test-Spring-Boot
+
 
     @Test
     public void testGetAllUsers() throws Exception {
@@ -71,6 +84,7 @@ public class UserServiceTest {
         // qua giong nhu user
         assertEquals(user.getEmail(), userDTO.getEmail());
     }
+
     @Test
     public void testDeleteUser() throws Exception {
         User user = new User("len1");
