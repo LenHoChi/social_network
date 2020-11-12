@@ -1,5 +1,6 @@
 package com.example.serviceTest;
 
+import com.example.TestRepositoryConfig;
 import com.example.dto.RelationshipDTO;
 import com.example.dto.UserDTO;
 import com.example.model.Relationship;
@@ -15,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ContextConfiguration(classes = TestRepositoryConfig.class)
 public class RelationshipServiseTest {
     @MockBean
     private RelationshipRepository relationshipRepository;
@@ -73,17 +76,31 @@ public class RelationshipServiseTest {
         assertTrue(result);
         //assertFalse(result);
     }
+    /*Tư tưởng của Mock đơn giản là khi muốn test (A gọi B) thì thay vì
+    tạo ra một đối tượng B thật sự, bạn tạo ra
+    một thằng B' giả mạo, có đầy đủ chức năng như B thật (nhưng không phải thật)
+    Bạn sẽ giả lập cho B' biết là khi thằng A gọi tới nó,
+    nó cần làm gì, trả lại cái gì (hardcode).
+    Miễn làm sao cho nó trả ra đúng cái thằng A cần để
+    chúng ta có thể test A thuận lợi nhất.*/
 
+
+    /*ở đây ta tạo ra thằng B giả là repository có đầy đủ phương thức như thật
+    * cho nó biết khi getfriendslist thì nó cần trả về cái gì*/
     @Test
     public void testGetFriendsList() throws Exception {
         List<String> lst = new ArrayList<>();
-        lst.add("len10");
         lst.add("len1");
 
         User user1 = new User("len1");
 
         when(relationshipRepository.getFriendList(user1.getEmail())).thenReturn(lst);
-        List<String> lst1 = relationshipRepository.getFriendList(user1.getEmail());
+        /*sau đó bắt đầu dùng thăng reponsitory này (B) để test hàm getfriendslist (A)(servise)
+        * xem nó có trả về đúng ko */
+
+        /*CHỐT:----> Nghĩa là nhét kịch bản vào reposiory sau đó dùng để test service*/
+        when(userRepository.existsById(user1.getEmail())).thenReturn(true);
+        List<String> lst1 = relationshipServiceImpl.getFriendsList(user1.getEmail());
 
         assertEquals(lst.size(), lst1.size());
     }
@@ -95,7 +112,8 @@ public class RelationshipServiseTest {
         lst.add("len1");
 
         when(relationshipRepository.getCommonFriendList(lst)).thenReturn(lst);
-        List<String> lst1 = relationshipRepository.getCommonFriendList(lst);
+        when(userRepository.existsById(Mockito.anyString())).thenReturn(true);
+        List<String> lst1 = relationshipServiceImpl.getCommonFriendsList(lst);
 
         assertEquals(lst.size(), lst1.size());
     }
@@ -137,7 +155,8 @@ public class RelationshipServiseTest {
         User user1 = new User("len1");
 
         when(relationshipRepository.getReceiveUpdatesList(user1.getEmail())).thenReturn(lst);
-        List<String> lst1 = relationshipRepository.getReceiveUpdatesList(user1.getEmail());
+        when(userRepository.existsById(user1.getEmail())).thenReturn(true);
+        List<String> lst1 = relationshipServiceImpl.getReceiveUpdateList(user1.getEmail());
 
         assertEquals(lst.size(), lst1.size());
     }

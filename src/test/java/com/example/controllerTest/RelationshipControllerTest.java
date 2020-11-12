@@ -1,5 +1,6 @@
 package com.example.controllerTest;
 
+import com.example.TestRepositoryConfig;
 import com.example.controller.RelationshipController;
 import com.example.controller.UserController;
 import com.example.dto.RelationshipDTO;
@@ -12,14 +13,20 @@ import com.example.service.RelationshipService;
 import com.example.service.UserService;
 import com.example.utils.request.RequestFriends;
 import com.example.utils.request.RequestFriendsList;
+import com.example.utils.request.RequestReciveUpdate;
+import com.example.utils.request.RequestSubcriber;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(RelationshipController.class)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RelationshipControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -123,14 +131,102 @@ public class RelationshipControllerTest {
         List<String> listEmail = new ArrayList<>();
         listEmail.add("len1");
         listEmail.add("len10");
+/*Tư tưởng của Mock đơn giản là khi muốn test (A gọi B) thì thay vì
+tạo ra một đối tượng B thật sự, bạn tạo ra
+một thằng B' giả mạo, có đầy đủ chức năng như B thật (nhưng không phải thật)
+Bạn sẽ giả lập cho B' biết là khi thằng A gọi tới nó,
+nó cần làm gì, trả lại cái gì (hardcode).
+Miễn làm sao cho nó trả ra đúng cái thằng A cần để
+chúng ta có thể test A thuận lợi nhất.*/
 
+
+        /*ở đây cần test là những phương thức trong servise--->cotroller
+        nên ta tạo ra thằng servise giả có đầy
+        * đủ chức năng như thật.... sau đó cho nó biết khi gọi hàm getfriendslist thì nó cần
+        * trả về cái gì*/
         when(relationshipService.getFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
+        /*sau đó ta bắt đầu test A (phương thức post) khi đã có B(hàm gerfriendslist)*/
+
+        /*CHỐT:----> Nghĩa là nhét kịch bản vào service sau đó dùng để test controller*/
+        /*test đâu chạy đó. tét controller thì chạy ở controoler
+        * nên ko cần quan tâm phương thức existsbyid như bên test service*/
         mockMvc.perform(post("/api/relationship/friendsList")
                 .content(asJsonString(requestFriendsList))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
         verify(relationshipService, times(1)).getFriendsList(requestFriendsList.getEmail());
+        verifyNoMoreInteractions(relationshipService);
+    }
+    @Test
+    public void testGetCommonFriendsList() throws Exception{
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("len1");
+        listEmail.add("len2");
+        RequestFriends requestFriends = new RequestFriends(listEmail);
+
+        List<String> lstEmail = new ArrayList<>();
+        lstEmail.add("len1");
+        lstEmail.add("len2");
+
+        when(relationshipService.getCommonFriendsList(lstEmail)).thenReturn(lstEmail);
+        mockMvc.perform(post("/api/relationship/commonFriendsList")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"));
+        verify(relationshipService, times(1)).getCommonFriendsList(lstEmail);
+        verifyNoMoreInteractions(relationshipService);
+    }
+
+    @Test
+    public void testBeSubciber() throws  Exception{
+        User user1 = new User("len1");
+        User user2 = new User("len10");
+
+        RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
+
+        when(relationshipService.beSubciber(user1.getEmail(), user2.getEmail())).thenReturn(true);
+
+        mockMvc.perform(post("/api/relationship/beSubcriber")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"));
+        verify(relationshipService, times(1)).beSubciber(user1.getEmail(), user2.getEmail());
+        verifyNoMoreInteractions(relationshipService);
+    }
+
+    @Test
+    public void testToBlock() throws Exception{
+        User user1 = new User("len1");
+        User user2 = new User("len10");
+        RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
+
+        when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(true);
+        mockMvc.perform(post("/api/relationship/toBlock")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"));
+        verify(relationshipService, times(1)).toBlock(user1.getEmail(), user2.getEmail());
+        verifyNoMoreInteractions(relationshipService);
+    }
+
+    @Test
+    public void testReceiveUpdate() throws Exception{
+        User user = new User("len1");
+        List<String> list = new ArrayList<>();
+        list.add("len");
+        RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail());
+
+        when(relationshipService.getReceiveUpdateList(user.getEmail())).thenReturn(list);
+        mockMvc.perform(post("/api/relationship/receiveUpdate")
+                .content(asJsonString(requestReciveUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"));
+        verify(relationshipService, times(1)).getReceiveUpdateList(user.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
 }

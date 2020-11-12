@@ -1,5 +1,6 @@
 package com.example.serviceTest;
 
+import com.example.TestRepositoryConfig;
 import com.example.dto.UserDTO;
 import com.example.model.User;
 import com.example.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.*;
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ContextConfiguration(classes = TestRepositoryConfig.class)
 public class UserServiceTest {
 //    cach 1
 //    @Mock
