@@ -162,12 +162,14 @@ public class RelationshipControllerTest {
 
     @Test
     public void testBeSubciber() throws  Exception{
+        Relationship relationship =new Relationship();
+
         User user1 = new User("len1");
         User user2 = new User("len10");
 
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
-        when(relationshipService.beSubciber(user1.getEmail(), user2.getEmail())).thenReturn(true);
+        when(relationshipService.beSubciber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
 
         mockMvc.perform(post("/api/relationship/beSubcriber")
                 .content(asJsonString(requestSubcriber))
@@ -180,11 +182,12 @@ public class RelationshipControllerTest {
 
     @Test
     public void testToBlock() throws Exception{
+        Relationship relationship =new Relationship();
         User user1 = new User("len1");
         User user2 = new User("len10");
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
-        when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(true);
+        when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
         mockMvc.perform(post("/api/relationship/toBlock")
                 .content(asJsonString(requestSubcriber))
                 .contentType(MediaType.APPLICATION_JSON))

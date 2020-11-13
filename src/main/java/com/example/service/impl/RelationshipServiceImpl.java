@@ -38,7 +38,6 @@ public class RelationshipServiceImpl implements RelationshipService {
         if (userEmail.equalsIgnoreCase(friendEmail)) {
             throw new RelationshipException("two emails are same");
         }
-
         RelationshipPK relationshipPK = new RelationshipPK(userEmail, friendEmail);
         Relationship relationship = getRelationship(relationshipPK);
 
@@ -50,7 +49,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         return true;
     }
 
-    public Relationship getRelationship(RelationshipPK relationshipPK) {
+    public Relationship getRelationship(RelationshipPK relationshipPK) throws RelationshipException {
         Relationship relationship = null;
         if (relationshipRepository.existsById(relationshipPK)) {
             Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
@@ -61,6 +60,8 @@ public class RelationshipServiceImpl implements RelationshipService {
                 } else {
                     return null;
                 }
+            }else{
+                throw new RelationshipException("Loi roi ban oi!");
             }
         } else {
             relationship = new Relationship(relationshipPK, true, false, false);
@@ -95,13 +96,13 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public boolean beSubciber(String email_requestor, String email_target) throws RelationshipException {
+    public Relationship beSubciber(String email_requestor, String email_target) throws RelationshipException {
+        Relationship relationship = null;
         if (email_requestor.equalsIgnoreCase(email_target)) {
             throw new RelationshipException("two emails are same");
         }
         if (userRepository.existsById(email_requestor) && userRepository.existsById(email_target)) {
             RelationshipPK relationshipPK = new RelationshipPK(email_requestor, email_target);
-            Relationship relationship = new Relationship();
             if (relationshipRepository.existsById(relationshipPK)) {
                 Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
                 relationship = relationship1.get();
@@ -113,23 +114,26 @@ public class RelationshipServiceImpl implements RelationshipService {
         } else {
             throw new ResouceNotFoundException("email do not match");
         }
-        return true;
+        return relationship;
     }
 
     @Override
-    public boolean toBlock(String email_requestor, String email_target) throws RelationshipException {
+    public Relationship toBlock(String email_requestor, String email_target) throws RelationshipException {
+        Relationship relationship = null;
         if (email_requestor.equalsIgnoreCase(email_target)) {
             throw new RelationshipException("two emails are same");
         }
         if (userRepository.existsById(email_requestor) && userRepository.existsById(email_target)) {
             RelationshipPK relationshipPK = new RelationshipPK(email_requestor, email_target);
-            Relationship relationship = new Relationship();
             if (relationshipRepository.existsById(relationshipPK)) {
                 Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
                 relationship = relationship1.get();
                 relationship.setIsSubcriber(false);
                 if (!relationship.getAreFriends()) {
                     relationship.setIsBlock(true);
+                }
+                else{
+                    return relationship;
                 }
             } else {
                 relationship = new Relationship(relationshipPK, false, false, true);
@@ -138,7 +142,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         } else {
             throw new ResouceNotFoundException("not found email matched");
         }
-        return true;
+        return relationship;
     }
 
     @Override

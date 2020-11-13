@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.RelationshipDTO;
 import com.example.exception.RelationshipException;
+import com.example.model.Relationship;
 import com.example.model.RelationshipPK;
 import com.example.service.RelationshipService;
 import com.example.utils.request.RequestFriends;
@@ -80,18 +81,18 @@ public class RelationshipController {
     //{"requestor":"newmooncsu1@gmail.com", "target":"newmooncsu2@gmail.com"} with request
     @PostMapping("relationship/beSubcriber")
     public ResponseEntity<Map<String, Object>> beSubcriber(@Valid @RequestBody RequestSubcriber requestSubcriber) throws RelationshipException {
-        boolean success = relationshipService.beSubciber(requestSubcriber.getRequestor(), requestSubcriber.getTarget());
+        Relationship success = relationshipService.beSubciber(requestSubcriber.getRequestor(), requestSubcriber.getTarget());
         Map<String, Object> body = new HashMap<>();
-        body.put("Success", success);
+        body.put("Success", true);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     //Cau5
     @PostMapping("relationship/toBlock")
     public ResponseEntity<Map<String, Object>> toBlock(@Valid @RequestBody RequestSubcriber requestSubcriber) throws RelationshipException {
-        boolean success = relationshipService.toBlock(requestSubcriber.getRequestor(), requestSubcriber.getTarget());
+        Relationship success = relationshipService.toBlock(requestSubcriber.getRequestor(), requestSubcriber.getTarget());
         Map<String, Object> body = new HashMap<>();
-        body.put("Success", success);
+        body.put("Success", true);
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 

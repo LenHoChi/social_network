@@ -20,9 +20,9 @@ public interface RelationshipService {
 
     List<String> getCommonFriendsList(List<String> emailList) throws RelationshipException;
 
-    boolean beSubciber(String email_requestor, String email_target) throws RelationshipException;
+    Relationship beSubciber(String email_requestor, String email_target) throws RelationshipException;
 
-    boolean toBlock(String email_requestor, String email_target) throws RelationshipException;
+    Relationship toBlock(String email_requestor, String email_target) throws RelationshipException;
 
     List<String> getReceiveUpdateList(String email);
 }
