@@ -11,11 +11,11 @@ import com.example.service.RelationshipService;
 import com.example.utils.convert.RelationshipConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class RelationshipServiceImpl implements RelationshipService {
     @Autowired
