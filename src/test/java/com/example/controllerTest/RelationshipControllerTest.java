@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(RelationshipController.class)
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@AutoConfigureMockMvc(addFilters = false)
 public class RelationshipControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -86,17 +86,16 @@ public class RelationshipControllerTest {
         verify(relationshipService, times(1)).getAllRelationships();
         verifyNoMoreInteractions(relationshipService);
     }
-//loi 404 xay ra khi co the url sai
     @Test
     public void testGetRelationship() throws Exception {
-        RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
+        RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
         RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
         when(relationshipService.getRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
         mockMvc.perform(post("/api/relationship/getRelationshipbyId")
                 .content(asJsonString(relationshipPK))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.relationshipPK.userEmail", is("len1")))
+                .andExpect(jsonPath("$.relationshipPK.userEmail", is("newmooncsu@gmail.com")))
                 .andExpect(content().contentType("application/json"));
         verify(relationshipService, times(1)).getRelationshipById(relationshipPK);
         verifyNoMoreInteractions(relationshipService);
@@ -113,7 +112,6 @@ public class RelationshipControllerTest {
         User user2 = new User("len10");
 
         when(relationshipService.beFriends(user1.getEmail(), user2.getEmail())).thenReturn(true);
-//        when(relationshipService.beFriends(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         mockMvc.perform(post("/api/relationship")
                 .content(asJsonString(requestFriends))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -131,25 +129,8 @@ public class RelationshipControllerTest {
         List<String> listEmail = new ArrayList<>();
         listEmail.add("len1");
         listEmail.add("len10");
-/*Tư tưởng của Mock đơn giản là khi muốn test (A gọi B) thì thay vì
-tạo ra một đối tượng B thật sự, bạn tạo ra
-một thằng B' giả mạo, có đầy đủ chức năng như B thật (nhưng không phải thật)
-Bạn sẽ giả lập cho B' biết là khi thằng A gọi tới nó,
-nó cần làm gì, trả lại cái gì (hardcode).
-Miễn làm sao cho nó trả ra đúng cái thằng A cần để
-chúng ta có thể test A thuận lợi nhất.*/
-
-
-        /*ở đây cần test là những phương thức trong servise--->cotroller
-        nên ta tạo ra thằng servise giả có đầy
-        * đủ chức năng như thật.... sau đó cho nó biết khi gọi hàm getfriendslist thì nó cần
-        * trả về cái gì*/
         when(relationshipService.getFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
-        /*sau đó ta bắt đầu test A (phương thức post) khi đã có B(hàm gerfriendslist)*/
 
-        /*CHỐT:----> Nghĩa là nhét kịch bản vào service sau đó dùng để test controller*/
-        /*test đâu chạy đó. tét controller thì chạy ở controoler
-        * nên ko cần quan tâm phương thức existsbyid như bên test service*/
         mockMvc.perform(post("/api/relationship/friendsList")
                 .content(asJsonString(requestFriendsList))
                 .contentType(MediaType.APPLICATION_JSON))

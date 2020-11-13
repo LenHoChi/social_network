@@ -31,5 +31,6 @@ public class Relationship {
     @JoinColumn(name = "user_email", insertable = false, updatable = false)
     //@MapsId("userEmail")
     @JsonIgnoreProperties("relationships")
-    @EqualsAndHashCode.Exclude private User user;
+    @EqualsAndHashCode.Exclude
+    private User user;
 }

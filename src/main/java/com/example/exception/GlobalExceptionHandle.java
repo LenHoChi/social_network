@@ -25,10 +25,6 @@ public class GlobalExceptionHandle  extends ResponseEntityExceptionHandler{
                 .collect(Collectors.toList());
         body.put("errors", errors);
         return new ResponseEntity<>(body, headers, status);
-
-//        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Validation Failed",
-//                ex.getBindingResult().toString());
-//        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResouceNotFoundException.class)

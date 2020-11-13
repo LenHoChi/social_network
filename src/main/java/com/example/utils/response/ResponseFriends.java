@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"success", "friends", "count", "recipients", "errorMessage"})
+@JsonPropertyOrder({"success", "friends", "count", "recipients"})
 @Data
 public class ResponseFriends {
     @JsonProperty("success")
@@ -19,6 +19,4 @@ public class ResponseFriends {
     private Integer count;
     @JsonProperty("recipients")
     private List<String> recipients;
-    @JsonProperty("errorMessage")
-    private List<String> errorMessage;
 }

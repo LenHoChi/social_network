@@ -29,15 +29,16 @@ public class RelationshipController {
     public List<RelationshipDTO> getAllRelationships() {
         return relationshipService.getAllRelationships();
     }
-    //{ "userEmail": "len2", "friendEmail": "len6" }
+
+    //{"userEmail": "newmooncsu1@gmail.com","friendEmail": "newmooncsu2@gmail.com"}
     @PostMapping("/relationship/getRelationshipbyId")
     public Optional<RelationshipDTO> getRelationshipById(@Valid @RequestBody RelationshipPK relationshipPK) {
         return relationshipService.getRelationshipById(relationshipPK);
     }
 
     //Cau1
-    //{"friends":["len6","len2"]} with RequestFriends
-    //{"userEmail": "len3","friendEmail": "len1" } with RelationshipPK
+    //{"friends":["newmooncsu1@gmail.com","newmooncsu2@gmail.com"]} with RequestFriends
+    //{"userEmail": "newmooncsu1@gmail.com","friendEmail": "newmooncsu2@gmail.com" } with RelationshipPK
     @PostMapping("/relationship")
     public ResponseEntity<Map<String, Object>> beFriends(@Valid @RequestBody RequestFriends requestFriends) throws RelationshipException {
         boolean success = relationshipService.beFriends(requestFriends.getEmails().get(0), requestFriends.getEmails().get(1));
@@ -51,15 +52,10 @@ public class RelationshipController {
 
     //Cau2
     //len3 with String
-    //{"email":"len3"} with RequestFriendsList
+    //{"email":"newmooncsu1@gmail.com"} with RequestFriendsList
     @PostMapping("relationship/friendsList")
     public ResponseEntity<Map<String, Object>> getFriendList(@Valid @RequestBody RequestFriendsList requestFriendsList) {
         List<String> lst = relationshipService.getFriendsList(requestFriendsList.getEmail());
-//        ResponseFriends responseFriends = new ResponseFriends();
-//        responseFriends.setSuccess(true);
-//        responseFriends.setCount(lst.size());
-//        responseFriends.setFriends(lst);
-//        return responseFriends;
         Map<String, Object> body = new HashMap<>();
         body.put("Success", true);
         body.put("Count", lst.size());
@@ -67,13 +63,9 @@ public class RelationshipController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-    @GetMapping("relationship/friendsList/{id}")
-    public List<String> getFriendsList(@PathVariable(value = "id") String email) {
-        return relationshipService.getFriendsList(email);
-    }
-
     //Cau3
-    //["len3","len5"] with List<String>
+    //["newmooncsu1@gmail.com","newmooncsu3@gmail.com"] with List<String>
+    //{"friends":["newmooncsu1@gmail.com","newmooncsu3@gmail.com"]}
     @PostMapping("relationship/commonFriendsList")
     public ResponseEntity<Map<String, Object>> getCommonFriendsList(@Valid @RequestBody RequestFriends requestFriends) throws RelationshipException {
         List<String> lst = relationshipService.getCommonFriendsList(requestFriends.getEmails());
@@ -85,7 +77,7 @@ public class RelationshipController {
     }
 
     //Cau4
-    //{"requestor":"len3", "target":"len1"} with request
+    //{"requestor":"newmooncsu1@gmail.com", "target":"newmooncsu2@gmail.com"} with request
     @PostMapping("relationship/beSubcriber")
     public ResponseEntity<Map<String, Object>> beSubcriber(@Valid @RequestBody RequestSubcriber requestSubcriber) throws RelationshipException {
         boolean success = relationshipService.beSubciber(requestSubcriber.getRequestor(), requestSubcriber.getTarget());
@@ -100,10 +92,11 @@ public class RelationshipController {
         boolean success = relationshipService.toBlock(requestSubcriber.getRequestor(), requestSubcriber.getTarget());
         Map<String, Object> body = new HashMap<>();
         body.put("Success", success);
-        return new ResponseEntity<>(body, HttpStatus.OK);    }
+        return new ResponseEntity<>(body, HttpStatus.OK);
+    }
 
     //Cau6
-    //{"sender":"len3"}
+    //{"sender":"newmooncsu1@gmail.com"}
     @PostMapping("relationship/receiveUpdate")
     public ResponseEntity<Map<String, Object>> getReceiveUpdateList(@Valid @RequestBody RequestReciveUpdate requestReciveUpdate) {
         List<String> lst = relationshipService.getReceiveUpdateList(requestReciveUpdate.getSender());
@@ -111,10 +104,5 @@ public class RelationshipController {
         body.put("Success", true);
         body.put("recipients", lst);
         return new ResponseEntity<>(body, HttpStatus.OK);
-    }
-
-    @GetMapping("relationship/receiveUpdate/{id}")
-    public List<String> getReceiveUpdateList(@PathVariable(value = "id") String email) {
-        return relationshipService.getReceiveUpdateList(email);
     }
 }

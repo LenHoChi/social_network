@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,31 +32,15 @@ import static org.mockito.Mockito.*;
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = TestRepositoryConfig.class)
+//@ContextConfiguration(classes = TestRepositoryConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class UserServiceTest {
-//    cach 1
-//    @Mock
-//    private UserRepository userRepository;
-    //cach 2
     @MockBean
     private UserRepository userRepository;
-
-    //@InjectMocks --->cach 1
-    //cach 2 (use like below)
     @Autowired
     private UserServiceImpl userServiceImpl;
 
     private UserConvert userConvert;
-    //cach 1 ---> test voi Mockito
-    //dung @runwith(mockito..) thi ko dung cai nay nua
-    //    @Before
-    //    public void setUp() throws Exception {
-    //        MockitoAnnotations.initMocks(this);
-    //    }
-    //https://loda.me/test-huong-dan-toan-tap-mockito-loda1576641016810/
-
-    //cach 2 ---> test voi @MockBean
-    //https://kipalog.com/posts/Spring-Boot--18--Hu-o--ng-da--n-chi-tie--t-Test-Spring-Boot
 
 
     @Test
@@ -83,8 +68,6 @@ public class UserServiceTest {
         User user = new User("len1");
         when(userRepository.save(user)).thenReturn(user);
         UserDTO userDTO = userServiceImpl.saveUser(userConvert.modelToDTO(user));
-        //kiem tra xem ham save co duoc thuc thi hay ko. neu ham sava dc goi thi no se tra ve dto co ket
-        // qua giong nhu user
         assertEquals(user.getEmail(), userDTO.getEmail());
     }
 
@@ -94,7 +77,6 @@ public class UserServiceTest {
         when(userRepository.findById(user.getEmail())).thenReturn(Optional.of(user));
         doNothing().when(userRepository).delete(user);
         userServiceImpl.deleteUser(user.getEmail());
-        //verify kiem tra xem ham findbyid va delete co duoc goi ko
         verify(userRepository, times(1)).findById(user.getEmail());
         verify(userRepository, times(1)).delete(user);
     }

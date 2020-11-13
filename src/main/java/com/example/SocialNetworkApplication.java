@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import javax.persistence.EntityManager;
 
 @SpringBootApplication
-//@EnableJpaAuditing
 public class SocialNetworkApplication implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication.run(SocialNetworkApplication.class, args);
