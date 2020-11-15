@@ -12,6 +12,7 @@ import com.example.repository.RelationshipRepository;
 import com.example.repository.UserRepository;
 import com.example.service.impl.RelationshipServiceImpl;
 import com.example.utils.convert.RelationshipConvert;
+import io.jsonwebtoken.lang.Objects;
 import net.bytebuddy.pool.TypePool;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,10 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -45,6 +43,7 @@ public class RelationshipServiseTest {
 
     private RelationshipConvert relationshipConvert;
 
+    //test get all relationships
     @Test
     public void testGetRelationships() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
@@ -58,9 +57,9 @@ public class RelationshipServiseTest {
         List<RelationshipDTO> relationshipDTOList = relationshipServiceImpl.getAllRelationships();
         assertEquals(relationshipList.size(), relationshipDTOList.size());
     }
-
+    //test get relationship by id
     @Test
-    public void testGetUserById() throws Exception {
+    public void testGetRelationshipById() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
         Relationship relationship = new Relationship(relationshipPK, true, false, false);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
@@ -82,7 +81,7 @@ public class RelationshipServiseTest {
         assertTrue(result);
         //assertFalse(result);
     }
-    //tc2
+    //tc2 -- 2 email the same
     @Test
     public void testBeFriendsSameEmail() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
@@ -97,7 +96,7 @@ public class RelationshipServiseTest {
 
     }
     //test for getRelationship
-    //tc1
+    //tc1 -- not exists relationship
     @Test
     public void testGetRelationshipFalseExists() throws Exception{
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
@@ -110,9 +109,23 @@ public class RelationshipServiseTest {
         assertEquals(relationship.getRelationshipPK(), relationshipPK);
     }
     //tc2 th ispresent == empty()
+    @Test
+    public void testGetRelationshipIsEmpty() throws Exception {
+        RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
+
+        Relationship relationship = new Relationship(relationshipPK, false, false, true);
+
+        when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
+        when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.empty());
+        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipServiceImpl.getRelationship(relationshipPK));
+        assertEquals("Loi roi ban oi!", exception.getMessage());
+//        Relationship relationship1 = relationshipServiceImpl.getRelationship(relationshipPK);
+//        Collection collection =(Collection) relationship1;
+//        assertTrue(collection.isEmpty());
+    }
     //tc3 isblock == true
     @Test
-    public void testGetRelationshipTrueExists() throws Exception {
+    public void testGetRelationshipTrueBlock() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
 
         Relationship relationship = new Relationship(relationshipPK, false, false, true);
@@ -125,7 +138,7 @@ public class RelationshipServiseTest {
     }
     //tc4 isblock == false
     @Test
-    public void testGetRelationshipTrueExists2() throws Exception {
+    public void testGetRelationshipFalseBlock() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
 
         Relationship relationship = new Relationship(relationshipPK, false, false, false);
@@ -269,7 +282,7 @@ public class RelationshipServiseTest {
         assertTrue(result.getIsSubcriber());
     }
     //test for block
-    //tc1
+    //tc1 -- same email
     @Test
     public void testToBlockErrorSame() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
@@ -346,7 +359,7 @@ public class RelationshipServiseTest {
         assertFalse(result.getIsSubcriber());
     }
     //test for reciuveupdatelist
-    //tc1
+    //tc1 -- happycase
     @Test
     public void testGetReceiveUpdateList() throws Exception {
         List<String> lst = new ArrayList<>();
@@ -361,7 +374,7 @@ public class RelationshipServiseTest {
 
         assertEquals(lst.size(), lst1.size());
     }
-    //tc2
+    //tc2 -- not found
     @Test
     public void testGetReceiveUpdateListError() throws Exception {
         List<String> lst = new ArrayList<>();

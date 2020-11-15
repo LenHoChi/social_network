@@ -16,6 +16,7 @@ import com.example.utils.request.RequestFriendsList;
 import com.example.utils.request.RequestReciveUpdate;
 import com.example.utils.request.RequestSubcriber;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -29,6 +30,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -205,11 +207,15 @@ public class RelationshipControllerTest {
         RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail());
 
         when(relationshipService.getReceiveUpdateList(user.getEmail())).thenReturn(list);
-        mockMvc.perform(post("/api/relationship/receiveUpdate")
+        MvcResult result = mockMvc.perform(post("/api/relationship/receiveUpdate")
                 .content(asJsonString(requestReciveUpdate))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"));
+                .andExpect(content().contentType("application/json"))
+                //.andExpect(jsonPath("$.recipients", is(""+"[len]"+"")))
+                .andExpect(jsonPath("$.*", Matchers.hasSize(2))).andReturn();
+        String content = result.getResponse().getContentAsString();
+
         verify(relationshipService, times(1)).getReceiveUpdateList(user.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
