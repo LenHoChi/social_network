@@ -1,15 +1,18 @@
-version: '3.1'
+version: '3.2'
 services:
   app:
-    container_name: springboot-postgresql
-    image: springboot-postgresql
+    container_name: demo
+    image: demo
     build: ./
     ports:
       - "8080:8080"
     depends_on:
-      - postgresqldb
-  postgresqldb:
+      - db
+    environment:
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/social_network'
+  db:
     image: postgres
+    container_name: db
     ports:
       - "5432:5432"
     environment:

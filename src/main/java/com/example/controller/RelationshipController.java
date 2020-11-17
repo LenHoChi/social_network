@@ -32,7 +32,7 @@ public class RelationshipController {
     }
 
     //{"userEmail": "newmooncsu1@gmail.com","friendEmail": "newmooncsu2@gmail.com"}
-    @PostMapping("/relationship/getRelationshipbyId")
+    @PostMapping("/relationship/get-relationship-by-id")
     public Optional<RelationshipDTO> getRelationshipById(@Valid @RequestBody RelationshipPK relationshipPK) {
         return relationshipService.getRelationshipById(relationshipPK);
     }

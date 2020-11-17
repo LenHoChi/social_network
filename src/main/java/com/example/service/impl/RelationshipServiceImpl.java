@@ -22,15 +22,14 @@ public class RelationshipServiceImpl implements RelationshipService {
     RelationshipRepository relationshipRepository;
     @Autowired
     UserRepository userRepository;
-    RelationshipConvert relationshipConvert;
     @Override
     public Optional<RelationshipDTO> getRelationshipById(RelationshipPK relationshipPK) {
-        return Optional.ofNullable(relationshipConvert.modelToDTO(relationshipRepository.findById(relationshipPK).get()));
+        return Optional.ofNullable(RelationshipConvert.modelToDTO(relationshipRepository.findById(relationshipPK).get()));
     }
 
     @Override
     public List<RelationshipDTO> getAllRelationships() {
-        return relationshipConvert.listModelToListDTO(relationshipRepository.findAll());
+        return RelationshipConvert.listModelToListDTO(relationshipRepository.findAll());
     }
 
     @Override
@@ -51,7 +50,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public Relationship getRelationship(RelationshipPK relationshipPK) throws RelationshipException {
         Relationship relationship = null;
-        if (relationshipRepository.existsById(relationshipPK)) {
+        //if (relationshipRepository.existsById(relationshipPK)) {
             Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
             if (relationship1.isPresent()) {
                 relationship = relationship1.get();
@@ -61,11 +60,12 @@ public class RelationshipServiceImpl implements RelationshipService {
                     return null;
                 }
             }else{
-                throw new RelationshipException("Loi roi ban oi!");
+               // throw new RelationshipException("Loi roi ban oi!");
+                relationship = new Relationship(relationshipPK, true, false, false);
             }
-        } else {
-            relationship = new Relationship(relationshipPK, true, false, false);
-        }
+//        } else {
+//            relationship = new Relationship(relationshipPK, true, false, false);
+//        }
         return relationship;
     }
 

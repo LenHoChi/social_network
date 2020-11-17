@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RelationshipConvert {
     static ModelMapper modelMapper = new ModelMapper();
@@ -15,10 +16,11 @@ public class RelationshipConvert {
     }
     public static List<RelationshipDTO> listModelToListDTO(List<Relationship> list){
         List<RelationshipDTO> list1 = new ArrayList<>();
-        for(int i=0;i<list.size();i++){
-            RelationshipDTO relationshipDTO = modelMapper.map(list.get(i), RelationshipDTO.class);
-            list1.add(relationshipDTO);
-        }
-        return list1;
+        return list.stream().map(ele -> modelMapper.map(ele, RelationshipDTO.class)).collect(Collectors.toList());
+//        for(int i=0;i<list.size();i++){
+//            RelationshipDTO relationshipDTO = modelMapper.map(list.get(i), RelationshipDTO.class);
+//            list1.add(relationshipDTO);
+//        }
+//        return list1;
     }
 }
