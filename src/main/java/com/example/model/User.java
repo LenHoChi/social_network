@@ -18,7 +18,7 @@ import java.util.Set;
 public class User implements Serializable {
     @Id
     @Column(name = "email")
-    @Email(message = "Loi email")
+    @Email(message = "error email")
     @NonNull
     private String email;
 

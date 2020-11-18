@@ -52,7 +52,7 @@ public class UserServiceTest {
         List<User> userList = Arrays.asList(user, user1);
 
         when(userRepository.findAll()).thenReturn(userList);
-        List<UserDTO> userList1 = userService.getAllUsers();
+        List<UserDTO> userList1 = userService.findAllUsers();
         assertEquals(userList.size(), userList1.size());
     }
 
@@ -60,8 +60,8 @@ public class UserServiceTest {
     public void testGetUserById() throws Exception {
         User user = new User("len1");
         when(userRepository.findById(user.getEmail())).thenReturn(Optional.of(user));
-        Optional<UserDTO> user1 = userService.getUserById(user.getEmail());
-        assertEquals(user.getEmail(), user1.get().getEmail());
+        Optional<UserDTO> userRoot = userService.findUserById(user.getEmail());
+        assertEquals(user.getEmail(), userRoot.get().getEmail());
     }
 
     @Test

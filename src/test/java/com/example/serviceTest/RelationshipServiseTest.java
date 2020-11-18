@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -39,7 +40,7 @@ public class RelationshipServiseTest {
     @MockBean
     private UserRepository userRepository;
     @Autowired
-    private RelationshipServiceImpl relationshipServiceImpl;
+    private RelationshipServiceImpl relationshipService;
 
     private RelationshipConvert relationshipConvert;
 
@@ -50,11 +51,11 @@ public class RelationshipServiseTest {
         Relationship relationship = new Relationship(relationshipPK, true, false, false);
 
         RelationshipPK relationshipPK1 = new RelationshipPK("len2", "len10");
-        Relationship relationship1 = new Relationship(relationshipPK, true, false, false);
+        Relationship relationship1 = new Relationship(relationshipPK1, true, false, false);
 
         List<Relationship> relationshipList = Arrays.asList(relationship, relationship1);
         when(relationshipRepository.findAll()).thenReturn(relationshipList);
-        List<RelationshipDTO> relationshipDTOList = relationshipServiceImpl.getAllRelationships();
+        List<RelationshipDTO> relationshipDTOList = relationshipService.findAllRelationships();
         assertEquals(relationshipList.size(), relationshipDTOList.size());
     }
     //test get relationship by id
@@ -63,7 +64,7 @@ public class RelationshipServiseTest {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
         Relationship relationship = new Relationship(relationshipPK, true, false, false);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
-        Optional<RelationshipDTO> relationshipDTO = relationshipServiceImpl.getRelationshipById(relationshipPK);
+        Optional<RelationshipDTO> relationshipDTO = relationshipService.findRelationshipById(relationshipPK);
         assertEquals(relationship.getRelationshipPK().getUserEmail(), relationshipDTO.get().getRelationshipPK().getUserEmail());
     }
     //test for be friend
@@ -77,7 +78,7 @@ public class RelationshipServiseTest {
         User user2 = new User("len10");
 
         when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Boolean result = relationshipServiceImpl.beFriends(user1.getEmail(), user2.getEmail());
+        Boolean result = relationshipService.beFriends(user1.getEmail(), user2.getEmail());
         assertTrue(result);
         //assertFalse(result);
     }
@@ -91,52 +92,53 @@ public class RelationshipServiseTest {
         User user2 = new User("len1");
 
         when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipServiceImpl.beFriends(user1.getEmail(), user2.getEmail()));
+        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipService.beFriends(user1.getEmail(), user2.getEmail()));
         assertEquals("two emails are same", exception.getMessage());
 
     }
     //test for getRelationship
-    //tc1 -- not exists relationship
+    //tc1 -- exists relationship happy case
     @Test
     public void testGetRelationshipFalseExists() throws Exception{
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
+        Relationship relationship = new Relationship(relationshipPK, false, false, false);
+        when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
 
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(false);
-        Relationship relationship = relationshipServiceImpl.getRelationship(relationshipPK);
-        assertTrue(relationship.getAreFriends());
-        assertFalse(relationship.getIsBlock());
-        assertFalse(relationship.getIsSubcriber());
-        assertEquals(relationship.getRelationshipPK(), relationshipPK);
+        Relationship relationshipResult = relationshipService.getRelationship(relationshipPK);
+        assertTrue(relationshipResult.getAreFriends());
+        assertFalse(relationshipResult.getIsBlock());
+        assertFalse(relationshipResult.getIsSubscriber());
+        assertEquals(relationshipResult.getRelationshipPK(), relationshipPK);
     }
-    //tc2 th ispresent == empty()
+    //tc2 th isPresent == empty()
     @Test
     public void testGetRelationshipIsEmpty() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
 
-        Relationship relationship = new Relationship(relationshipPK, false, false, true);
-
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.empty());
-        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipServiceImpl.getRelationship(relationshipPK));
-        assertEquals("Loi roi ban oi!", exception.getMessage());
+        Relationship relationshipResult = relationshipService.getRelationship(relationshipPK);
+        assertTrue(relationshipResult.getAreFriends());
+        assertFalse(relationshipResult.getIsBlock());
+        assertFalse(relationshipResult.getIsSubscriber());
+        assertEquals(relationshipResult.getRelationshipPK(), relationshipPK);
 //        Relationship relationship1 = relationshipServiceImpl.getRelationship(relationshipPK);
 //        Collection collection =(Collection) relationship1;
 //        assertTrue(collection.isEmpty());
     }
-    //tc3 isblock == true
+    //tc3 isBlock == true
     @Test
     public void testGetRelationshipTrueBlock() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
 
         Relationship relationship = new Relationship(relationshipPK, false, false, true);
 
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
-
-        Relationship relationship1 = relationshipServiceImpl.getRelationship(relationshipPK);
-        assertNull(relationship1);
+        Throwable exception = assertThrows(Exception.class, () -> relationshipService.getRelationship(relationshipPK));
+        assertEquals("Error", exception.getMessage());
+//        Relationship relationship1 = relationshipServiceImpl.getRelationship(relationshipPK);
+//        assertNull(relationship1);
     }
-    //tc4 isblock == false
+    //tc4 isBlock == false
     @Test
     public void testGetRelationshipFalseBlock() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
@@ -146,81 +148,83 @@ public class RelationshipServiseTest {
         when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
 
-        Relationship relationship1 = relationshipServiceImpl.getRelationship(relationshipPK);
+        Relationship relationship1 = relationshipService.getRelationship(relationshipPK);
         assertTrue(relationship1.getAreFriends());
         assertFalse(relationship1.getIsBlock());
-        assertFalse(relationship1.getIsSubcriber());
+        assertFalse(relationship1.getIsSubscriber());
         assertEquals(relationship1.getRelationshipPK(), relationshipPK);
     }
-    //test for getFriendslist
+    //test for getListFriends
     //tc1 happy case
     @Test
     public void testGetFriendsList() throws Exception {
-        List<String> lst = new ArrayList<>();
-        lst.add("len1");
+        List<String> lstFriend = new ArrayList<>();
+        lstFriend.add("len1");
 
-        User user1 = new User("len1");
+        User user = new User("len1");
 
-        when(relationshipRepository.getFriendList(user1.getEmail())).thenReturn(lst);
+        when(relationshipRepository.getFriendList(user.getEmail())).thenReturn(lstFriend);
 
-        when(userRepository.existsById(user1.getEmail())).thenReturn(true);
-        List<String> lst1 = relationshipServiceImpl.getFriendsList(user1.getEmail());
+        when(userRepository.existsById(user.getEmail())).thenReturn(true);
+        List<String> lstTest = relationshipService.findFriendsList(user.getEmail());
 
-        assertEquals(lst.size(), lst1.size());
+        assertEquals(lstFriend.size(), lstTest.size());
     }
     //tc2 unhappy case
     @Test
     public void testGetFriendsListError() throws Exception{
-        List<String> lst = new ArrayList<>();
-        lst.add("len1");
+        List<String> lstFriend = new ArrayList<>();
+        lstFriend.add("len1");
 
-        User user1 = new User("len1");
+        User user = new User("len1");
 
-        when(relationshipRepository.getFriendList(user1.getEmail())).thenReturn(lst);
+        when(relationshipRepository.getFriendList(user.getEmail())).thenReturn(lstFriend);
 
-        when(userRepository.existsById(user1.getEmail())).thenReturn(false);
-        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipServiceImpl.getFriendsList(user1.getEmail()));
+        when(userRepository.existsById(user.getEmail())).thenReturn(false);
+        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.findFriendsList(user.getEmail()));
         assertEquals("Not found any email match with input", exception.getMessage());
     }
     //test for getCommonFriendsList
     //tc1 -- happy case
     @Test
     public void testGetCommonFriendsList() throws Exception {
-        List<String> lst = new ArrayList<>();
-        lst.add("len10");
-        lst.add("len1");
-
-        when(relationshipRepository.getCommonFriendList(lst)).thenReturn(lst);
+        List<String> lstCommonFriend = new ArrayList<>();
+        lstCommonFriend.add("len10");
+        lstCommonFriend.add("len1");
+        List<String> lstTest = new ArrayList<>();
+        when(relationshipRepository.getFriendList(Mockito.anyString())).thenReturn(lstCommonFriend);
         when(userRepository.existsById(Mockito.anyString())).thenReturn(true);
-        List<String> lst1 = relationshipServiceImpl.getCommonFriendsList(lst);
+        lstTest = relationshipService.findCommonFriendsList(lstCommonFriend);
 
-        assertEquals(lst.size(), lst1.size());
+        assertEquals(lstCommonFriend.size(), lstTest.size());
     }
     //tc2 -- unhappy ending
     @Test
     public void testGetCommonFriendsListErrorEmailSame() throws Exception {
-        List<String> lst = new ArrayList<>();
-        lst.add("len10");
-        lst.add("len10");
+        List<String> lstCommonFriend = new ArrayList<>();
+        lstCommonFriend.add("len10");
+        lstCommonFriend.add("len10");
 
-        when(relationshipRepository.getCommonFriendList(lst)).thenReturn(lst);
+        //when(relationshipRepository.getCommonFriendList(lst)).thenReturn(lst);
+        when(relationshipService.getCommonFriendList(lstCommonFriend)).thenReturn(lstCommonFriend);
         when(userRepository.existsById(Mockito.anyString())).thenReturn(true);
-        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipServiceImpl.getCommonFriendsList(lst));
+        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipService.findCommonFriendsList(lstCommonFriend));
         assertEquals("two emails are same", exception.getMessage());
     }
     //tc3 -- unhappy ending 2
     @Test
     public void testGetCommonFriendsListErrorEmailMatch() throws Exception {
-        List<String> lst = new ArrayList<>();
-        lst.add("len1");
-        lst.add("len10");
+        List<String> lstCommonFriend = new ArrayList<>();
+        lstCommonFriend.add("len1");
+        lstCommonFriend.add("len10");
 
-        when(relationshipRepository.getCommonFriendList(lst)).thenReturn(lst);
+        //when(relationshipRepository.getCommonFriendList(lstCommonFriend)).thenReturn(lstCommonFriend);
+        when(relationshipService.getCommonFriendList(lstCommonFriend)).thenReturn(lstCommonFriend);
         when(userRepository.existsById(Mockito.anyString())).thenReturn(false);
-        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipServiceImpl.getCommonFriendsList(lst));
+        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.findCommonFriendsList(lstCommonFriend));
         assertEquals("email do not match", exception.getMessage());
     }
-    //test for besubcriber
+    //test for beSubscriber
     //tc1 - same email
     @Test
     public void testBeSubcriberSameEmail() throws Exception{
@@ -231,8 +235,7 @@ public class RelationshipServiseTest {
         User user2 = new User("newmooncsu@gmail.com");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipServiceImpl.beSubciber(user1.getEmail(), user2.getEmail()));
+        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipService.beSubscriber(user1.getEmail(), user2.getEmail()));
         assertEquals("two emails are same", exception.getMessage());
     }
     //tc2 -- not match
@@ -245,8 +248,7 @@ public class RelationshipServiseTest {
         User user2 = new User("newmooncsu1@gmail.com");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(false);
-        when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipServiceImpl.beSubciber(user1.getEmail(), user2.getEmail()));
+        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.beSubscriber(user1.getEmail(), user2.getEmail()));
         assertEquals("email do not match", exception.getMessage());
     }
     //tc3 -- not friends
@@ -259,15 +261,14 @@ public class RelationshipServiseTest {
         User user2 = new User("len10");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(false);
-        //when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Relationship result = relationshipServiceImpl.beSubciber(user1.getEmail(), user2.getEmail());
-        assertTrue(result.getIsSubcriber());
+        when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.empty());
+        Relationship result = relationshipService.beSubscriber(user1.getEmail(), user2.getEmail());
+        assertTrue(result.getIsSubscriber());
         assertFalse(result.getAreFriends());
     }
     //tc4 -- were friends
     @Test
-    public void testBeSubciberWereFriends() throws Exception {
+    public void testBeSubscriberWereFriends() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
         Relationship relationship = new Relationship(relationshipPK, true, false, false);
 
@@ -275,11 +276,10 @@ public class RelationshipServiseTest {
         User user2 = new User("len10");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
 //        when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Relationship result = relationshipServiceImpl.beSubciber(user1.getEmail(), user2.getEmail());
-        assertTrue(result.getIsSubcriber());
+        Relationship result = relationshipService.beSubscriber(user1.getEmail(), user2.getEmail());
+        assertTrue(result.getIsSubscriber());
     }
     //test for block
     //tc1 -- same email
@@ -292,37 +292,31 @@ public class RelationshipServiseTest {
         User user2 = new User("len10");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        //when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipServiceImpl.toBlock(user1.getEmail(), user2.getEmail()));
+        Throwable exception = assertThrows(RelationshipException.class, () -> relationshipService.toBlock(user1.getEmail(), user2.getEmail()));
         assertEquals("two emails are same", exception.getMessage());
     }
-    //tc2 -- not match
+    //tc2 -- not exists email
     @Test
     public void testToBlockNotMatch() throws Exception{
-        RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
-        //Relationship relationship = new Relationship(relationshipPK, true, true, false);
 
         User user1 = new User("newmooncsu@gmail.com");
         User user2 = new User("newmooncsu1@gmail.com");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(false);
-        //when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipServiceImpl.toBlock(user1.getEmail(), user2.getEmail()));
+        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.toBlock(user1.getEmail(), user2.getEmail()));
         assertEquals("not found email matched", exception.getMessage());
     }
     //tc3 -- not relationship
     @Test
     public void testToBlockNotRelationship() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
-        //Relationship relationship = new Relationship(relationshipPK, true, false, false);
 
         User user1 = new User("len1");
         User user2 = new User("len10");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(false);
-        //when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Relationship result = relationshipServiceImpl.toBlock(user1.getEmail(), user2.getEmail());
+        when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.empty());
+        Relationship result = relationshipService.toBlock(user1.getEmail(), user2.getEmail());
         assertTrue(result.getIsBlock());
 
     }
@@ -336,10 +330,8 @@ public class RelationshipServiseTest {
         User user2 = new User("len10");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
-//        when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Relationship result = relationshipServiceImpl.toBlock(user1.getEmail(), user2.getEmail());
+        Relationship result = relationshipService.toBlock(user1.getEmail(), user2.getEmail());
         assertTrue(result.getIsBlock());
     }
     //   tc5 -- have relationship  were friends
@@ -352,11 +344,9 @@ public class RelationshipServiseTest {
         User user2 = new User("len10");
 
         when(userRepository.existsById(Mockito.any(String.class))).thenReturn(true);
-        when(relationshipRepository.existsById(relationshipPK)).thenReturn(true);
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
-//        when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
-        Relationship result = relationshipServiceImpl.toBlock(user1.getEmail(), user2.getEmail());
-        assertFalse(result.getIsSubcriber());
+        Relationship result = relationshipService.toBlock(user1.getEmail(), user2.getEmail());
+        assertFalse(result.getIsSubscriber());
     }
     //test for reciuveupdatelist
     //tc1 -- happycase
@@ -370,7 +360,7 @@ public class RelationshipServiseTest {
 
         when(relationshipRepository.getReceiveUpdatesList(user1.getEmail())).thenReturn(lst);
         when(userRepository.existsById(user1.getEmail())).thenReturn(true);
-        List<String> lst1 = relationshipServiceImpl.getReceiveUpdateList(user1.getEmail());
+        List<String> lst1 = relationshipService.findReceiveUpdateList(user1.getEmail());
 
         assertEquals(lst.size(), lst1.size());
     }
@@ -385,7 +375,7 @@ public class RelationshipServiseTest {
 
         when(relationshipRepository.getReceiveUpdatesList(user1.getEmail())).thenReturn(lst);
         when(userRepository.existsById(user1.getEmail())).thenReturn(false);
-        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipServiceImpl.getReceiveUpdateList(user1.getEmail()));
+        Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.findReceiveUpdateList(user1.getEmail()));
         assertEquals("not found any email matched", exception.getMessage());
     }
 }

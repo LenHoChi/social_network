@@ -29,7 +29,7 @@ public class GlobalExceptionHandle  extends ResponseEntityExceptionHandler{
 
     @ExceptionHandler(ResouceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<?> ResouceNotFoundException(ResouceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<?> ResourceNotFoundException(ResouceNotFoundException ex, WebRequest request) {
         ErrorDetails errordetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errordetails, HttpStatus.NOT_FOUND);
     }
@@ -40,5 +40,10 @@ public class GlobalExceptionHandle  extends ResponseEntityExceptionHandler{
     public ResponseEntity<?> friendException(RelationshipException ex, WebRequest request) {
         ErrorDetails errordetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errordetails, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

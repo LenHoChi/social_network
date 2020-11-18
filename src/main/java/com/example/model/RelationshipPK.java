@@ -18,11 +18,11 @@ import java.io.Serializable;
 public class RelationshipPK implements Serializable {
     //    @NonNull
     @Column(name = "user_email")
-    @Email(message = "Loi email")
+    @Email(message = "error email")
     private String userEmail;
     //    @NonNull
     @Column(name = "friend_email")
-    @Email(message = "Loi email")
+    @Email(message = "error email")
     private String friendEmail;
 
 

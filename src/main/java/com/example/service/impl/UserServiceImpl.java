@@ -20,13 +20,18 @@ public class UserServiceImpl implements UserService {
     UserRepository usersRepository;
     UserConvert userConvert;
     @Override
-    public List<UserDTO> getAllUsers() {
+    public List<UserDTO> findAllUsers() {
         return userConvert.listModelToListDTO(usersRepository.findAll());
     }
 
     @Override
-    public Optional<UserDTO> getUserById(String id) {
-        return Optional.ofNullable(userConvert.modelToDTO(usersRepository.findById(id).get()));
+    public Optional<UserDTO> findUserById(String id) throws Exception {
+        if(usersRepository.findById(id).isPresent()){
+            return Optional.ofNullable(userConvert.modelToDTO(usersRepository.findById(id).get()));
+        }else{
+            throw new Exception("error");
+//            throw new NoSuchFieldException();
+        }
     }
 
     @Override
@@ -35,11 +40,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Boolean> deleteUser(String userId) {
-        User users = usersRepository.findById(userId).get();
-        usersRepository.delete(users);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("delete ok", Boolean.TRUE);
-        return response;
+    public Map<String, Boolean> deleteUser(String userId) throws Exception {
+        if(usersRepository.findById(userId).isPresent()) {
+            User users = usersRepository.findById(userId).get();
+            usersRepository.delete(users);
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("delete ok", Boolean.TRUE);
+            return response;
+        }else{
+            throw new Exception("error");
+        }
     }
 }

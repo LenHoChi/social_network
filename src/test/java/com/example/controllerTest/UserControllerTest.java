@@ -63,7 +63,7 @@ public class UserControllerTest {
         UserDTO userDTOB = new UserDTO("len2");
         List<UserDTO> userDTOList = Arrays.asList(userDTOA, userDTOB);
         //when(userService.getAllUsers()).thenReturn(userDTOList);
-        given(userService.getAllUsers()).willReturn(userDTOList);
+        given(userService.findAllUsers()).willReturn(userDTOList);
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
                 //.andExpect(jsonPath("$.message").value("success"))
@@ -72,19 +72,19 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[1].email", is("len2")))
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)));
-        verify(userService, times(1)).getAllUsers();
+        verify(userService, times(1)).findAllUsers();
         verifyNoMoreInteractions(userService);
     }
 
     @Test
     public void testGetUser() throws Exception {
         UserDTO userDTO = new UserDTO("len1");
-        when(userService.getUserById(userDTO.getEmail())).thenReturn(Optional.of(userDTO));
+        when(userService.findUserById(userDTO.getEmail())).thenReturn(Optional.of(userDTO));
         mockMvc.perform(get("/api/users/{id}", userDTO.getEmail()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("len1")))
                 .andExpect(content().contentType("application/json"));
-        verify(userService, times(1)).getUserById(userDTO.getEmail());
+        verify(userService, times(1)).findUserById(userDTO.getEmail());
         verifyNoMoreInteractions(userService);
     }
 

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class RelationshipDTO {
     private RelationshipPK relationshipPK;
     private Boolean areFriends;
-    private Boolean isSubcriber;
+    private Boolean isSubscriber;
     private Boolean isBlock;
 }

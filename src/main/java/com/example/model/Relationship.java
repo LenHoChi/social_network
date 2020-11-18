@@ -20,9 +20,9 @@ public class Relationship {
     @Column(name = "arefriends")
     @NonNull
     private Boolean areFriends;
-    @Column(name = "issubcriber")
+    @Column(name = "issubscriber")
     @NonNull
-    private Boolean isSubcriber;
+    private Boolean isSubscriber;
     @Column(name = "isblock")
     @NonNull
     private Boolean isBlock;

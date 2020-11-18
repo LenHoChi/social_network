@@ -23,17 +23,17 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Autowired
     UserRepository userRepository;
     @Override
-    public Optional<RelationshipDTO> getRelationshipById(RelationshipPK relationshipPK) {
+    public Optional<RelationshipDTO> findRelationshipById(RelationshipPK relationshipPK) {
         return Optional.ofNullable(RelationshipConvert.modelToDTO(relationshipRepository.findById(relationshipPK).get()));
     }
 
     @Override
-    public List<RelationshipDTO> getAllRelationships() {
+    public List<RelationshipDTO> findAllRelationships() {
         return RelationshipConvert.listModelToListDTO(relationshipRepository.findAll());
     }
 
     @Override
-    public Boolean beFriends(String userEmail, String friendEmail) throws RelationshipException {
+    public Boolean beFriends(String userEmail, String friendEmail) throws Exception {
         if (userEmail.equalsIgnoreCase(friendEmail)) {
             throw new RelationshipException("two emails are same");
         }
@@ -48,68 +48,71 @@ public class RelationshipServiceImpl implements RelationshipService {
         return true;
     }
 
-    public Relationship getRelationship(RelationshipPK relationshipPK) throws RelationshipException {
+    public Relationship getRelationship(RelationshipPK relationshipPK) throws Exception {
         Relationship relationship = null;
-        //if (relationshipRepository.existsById(relationshipPK)) {
-            Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
-            if (relationship1.isPresent()) {
-                relationship = relationship1.get();
+            Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
+            if (relationshipRoot.isPresent()) {
+                relationship = relationshipRoot.get();
                 if (!relationship.getIsBlock()) {
                     relationship.setAreFriends(true);
                 } else {
-                    return null;
+                    throw new Exception("Error");
                 }
             }else{
-               // throw new RelationshipException("Loi roi ban oi!");
                 relationship = new Relationship(relationshipPK, true, false, false);
             }
-//        } else {
-//            relationship = new Relationship(relationshipPK, true, false, false);
-//        }
         return relationship;
     }
 
     @Override
-    public List<String> getFriendsList(String email) {
-        List<String> lst = new ArrayList<>();
+    public List<String> findFriendsList(String email) {
+        List<String> lstFriendList = new ArrayList<>();
         if (userRepository.existsById(email)) {
-            lst = relationshipRepository.getFriendList(email);
+            lstFriendList = relationshipRepository.getFriendList(email);
         } else {
             throw new ResouceNotFoundException("Not found any email match with input");
         }
-        return lst;
+        return lstFriendList;
     }
 
     @Override
-    public List<String> getCommonFriendsList(List<String> emailList) throws RelationshipException {
-        List<String> lst = new ArrayList<>();
+    public List<String> findCommonFriendsList(List<String> emailList) throws RelationshipException {
+        List<String> lstCommonFriendList = new ArrayList<>();
         if (emailList.get(0).equalsIgnoreCase(emailList.get(1))) {
             throw new RelationshipException("two emails are same");
         }
         if (userRepository.existsById(emailList.get(0)) && userRepository.existsById(emailList.get(1))) {
-            lst = relationshipRepository.getCommonFriendList(emailList);
+            //lstCommonFriendList = relationshipRepository.getCommonFriendList(emailList);
+            lstCommonFriendList = this.getCommonFriendList(emailList);
         } else {
             //throw new RelationshipException("emails do not match");
             throw new ResouceNotFoundException("email do not match");
         }
-        return lst;
+        return lstCommonFriendList;
     }
-
+    public List<String> getCommonFriendList(List<String> emailList){
+        List<String> lstEmailCommon = null;
+        List<String> lstEmail1 = relationshipRepository.getFriendList(emailList.get(0));
+        List<String> lstEmail2 = relationshipRepository.getFriendList(emailList.get(1));
+        lstEmail1.retainAll(lstEmail2);
+        lstEmailCommon = lstEmail1;
+        return lstEmailCommon;
+    }
     @Override
-    public Relationship beSubciber(String email_requestor, String email_target) throws RelationshipException {
+    public Relationship beSubscriber(String email_requestor, String email_target) throws RelationshipException {
         Relationship relationship = null;
         if (email_requestor.equalsIgnoreCase(email_target)) {
             throw new RelationshipException("two emails are same");
         }
         if (userRepository.existsById(email_requestor) && userRepository.existsById(email_target)) {
             RelationshipPK relationshipPK = new RelationshipPK(email_requestor, email_target);
-            if (relationshipRepository.existsById(relationshipPK)) {
-                Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
-                relationship = relationship1.get();
-                relationship.setIsSubcriber(true);
-            } else {
-                relationship = new Relationship(relationshipPK, false, true, false);
-            }
+                Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
+                if(relationshipRoot.isPresent()) {
+                    relationship = relationshipRoot.get();
+                    relationship.setIsSubscriber(true);
+                }else{
+                    relationship = new Relationship(relationshipPK, false, true, false);
+                }
             relationshipRepository.save(relationship);
         } else {
             throw new ResouceNotFoundException("email do not match");
@@ -125,19 +128,18 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         if (userRepository.existsById(email_requestor) && userRepository.existsById(email_target)) {
             RelationshipPK relationshipPK = new RelationshipPK(email_requestor, email_target);
-            if (relationshipRepository.existsById(relationshipPK)) {
-                Optional<Relationship> relationship1 = relationshipRepository.findById(relationshipPK);
-                relationship = relationship1.get();
-                relationship.setIsSubcriber(false);
-                if (!relationship.getAreFriends()) {
-                    relationship.setIsBlock(true);
+                Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
+                if(relationshipRoot.isPresent()) {
+                    relationship = relationshipRoot.get();
+                    relationship.setIsSubscriber(false);
+                    if (!relationship.getAreFriends()) {
+                        relationship.setIsBlock(true);
+                    } else {
+                        return relationship;
+                    }
+                }else{
+                    relationship = new Relationship(relationshipPK, false, false, true);
                 }
-                else{
-                    return relationship;
-                }
-            } else {
-                relationship = new Relationship(relationshipPK, false, false, true);
-            }
             relationshipRepository.save(relationship);
         } else {
             throw new ResouceNotFoundException("not found email matched");
@@ -146,13 +148,13 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public List<String> getReceiveUpdateList(String email) {
-        List<String> lst = new ArrayList<>();
+    public List<String> findReceiveUpdateList(String email) {
+        List<String> lstReceiveUpdate = new ArrayList<>();
         if (userRepository.existsById(email)) {
-            lst = relationshipRepository.getReceiveUpdatesList(email);
+            lstReceiveUpdate = relationshipRepository.getReceiveUpdatesList(email);
         } else {
             throw new ResouceNotFoundException("not found any email matched");
         }
-        return lst;
+        return lstReceiveUpdate;
     }
 }

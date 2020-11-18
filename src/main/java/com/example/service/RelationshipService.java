@@ -10,19 +10,19 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface RelationshipService {
-    Optional<RelationshipDTO> getRelationshipById(RelationshipPK relationshipPK);
+    Optional<RelationshipDTO> findRelationshipById(RelationshipPK relationshipPK);
 
-    List<RelationshipDTO> getAllRelationships();
+    List<RelationshipDTO> findAllRelationships();
 
-    Boolean beFriends(String userEmail, String friendEmail) throws RelationshipException;
+    Boolean beFriends(String userEmail, String friendEmail) throws Exception;
 
-    List<String> getFriendsList(String email);
+    List<String> findFriendsList(String email);
 
-    List<String> getCommonFriendsList(List<String> emailList) throws RelationshipException;
+    List<String> findCommonFriendsList(List<String> emailList) throws RelationshipException;
 
-    Relationship beSubciber(String email_requestor, String email_target) throws RelationshipException;
+    Relationship beSubscriber(String email_requestor, String email_target) throws RelationshipException;
 
     Relationship toBlock(String email_requestor, String email_target) throws RelationshipException;
 
-    List<String> getReceiveUpdateList(String email);
+    List<String> findReceiveUpdateList(String email);
 }

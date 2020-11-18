@@ -4,35 +4,42 @@ import com.example.dto.UserDTO;
 import com.example.model.User;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users")
-    public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("")
+    public ResponseEntity<?> findAllUsers(){
+        List<UserDTO> listUserDTO = userService.findAllUsers();
+        if(listUserDTO.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
-    @PostMapping("/users")
-    public UserDTO createUser(@Valid @RequestBody UserDTO userDTO) {
-        return userService.saveUser(userDTO);
+    @PostMapping("")
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.saveUser(userDTO));
     }
 
-    @DeleteMapping("/users/{id}")
-    public Map<String, Boolean> deleteUser(@PathVariable(value = "id") String id) {
-        return userService.deleteUser(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable(value = "id") String id) throws Exception {
+        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
     }
 
-    @GetMapping("/users/{id}")
-    public UserDTO getUserById(@PathVariable(value = "id") String id) {
-        return userService.getUserById(id).get();
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findUserById(@PathVariable(value = "id") String id) throws Exception {
+        return ResponseEntity.ok(userService.findUserById(id));
     }
 }

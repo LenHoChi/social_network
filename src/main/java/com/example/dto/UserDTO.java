@@ -10,6 +10,6 @@ import javax.validation.constraints.Email;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    @Email(message = "Loi email")
+    @Email(message = "error email")
     private String email;
 }

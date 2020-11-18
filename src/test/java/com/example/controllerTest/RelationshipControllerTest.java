@@ -77,7 +77,7 @@ public class RelationshipControllerTest {
 
         List<RelationshipDTO> relationshipDTOList = Arrays.asList(relationshipDTO, relationshipDTO1);
         //given(relationshipService.getAllRelationships()).willReturn(relationshipDTOList);
-        when(relationshipService.getAllRelationships()).thenReturn(relationshipDTOList);
+        when(relationshipService.findAllRelationships()).thenReturn(relationshipDTOList);
         mockMvc.perform(get("/api/relationship"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -85,21 +85,21 @@ public class RelationshipControllerTest {
                 .andExpect(jsonPath("$[1].relationshipPK.userEmail", is("len2")))
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)));
-        verify(relationshipService, times(1)).getAllRelationships();
+        verify(relationshipService, times(1)).findAllRelationships();
         verifyNoMoreInteractions(relationshipService);
     }
     @Test
     public void testGetRelationship() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
         RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
-        when(relationshipService.getRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
+        when(relationshipService.findRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
         mockMvc.perform(post("/api/relationship/getRelationshipbyId")
                 .content(asJsonString(relationshipPK))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.relationshipPK.userEmail", is("newmooncsu@gmail.com")))
                 .andExpect(content().contentType("application/json"));
-        verify(relationshipService, times(1)).getRelationshipById(relationshipPK);
+        verify(relationshipService, times(1)).findRelationshipById(relationshipPK);
         verifyNoMoreInteractions(relationshipService);
     }
 
@@ -131,14 +131,14 @@ public class RelationshipControllerTest {
         List<String> listEmail = new ArrayList<>();
         listEmail.add("len1");
         listEmail.add("len10");
-        when(relationshipService.getFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
+        when(relationshipService.findFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
 
         mockMvc.perform(post("/api/relationship/friendsList")
                 .content(asJsonString(requestFriendsList))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
-        verify(relationshipService, times(1)).getFriendsList(requestFriendsList.getEmail());
+        verify(relationshipService, times(1)).findFriendsList(requestFriendsList.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
     @Test
@@ -152,18 +152,18 @@ public class RelationshipControllerTest {
         lstEmail.add("len1");
         lstEmail.add("len2");
 
-        when(relationshipService.getCommonFriendsList(lstEmail)).thenReturn(lstEmail);
+        when(relationshipService.findCommonFriendsList(lstEmail)).thenReturn(lstEmail);
         mockMvc.perform(post("/api/relationship/commonFriendsList")
                 .content(asJsonString(requestFriends))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
-        verify(relationshipService, times(1)).getCommonFriendsList(lstEmail);
+        verify(relationshipService, times(1)).findCommonFriendsList(lstEmail);
         verifyNoMoreInteractions(relationshipService);
     }
 
     @Test
-    public void testBeSubciber() throws  Exception{
+    public void testBeSubscriber() throws  Exception{
         Relationship relationship =new Relationship();
 
         User user1 = new User("len1");
@@ -171,14 +171,14 @@ public class RelationshipControllerTest {
 
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
-        when(relationshipService.beSubciber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+        when(relationshipService.beSubscriber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
 
         mockMvc.perform(post("/api/relationship/beSubcriber")
                 .content(asJsonString(requestSubcriber))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
-        verify(relationshipService, times(1)).beSubciber(user1.getEmail(), user2.getEmail());
+        verify(relationshipService, times(1)).beSubscriber(user1.getEmail(), user2.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
 
@@ -202,11 +202,11 @@ public class RelationshipControllerTest {
     @Test
     public void testReceiveUpdate() throws Exception{
         User user = new User("len1");
-        List<String> list = new ArrayList<>();
-        list.add("len");
+        List<String> listReceiveUpload = new ArrayList<>();
+        listReceiveUpload.add("len");
         RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail());
 
-        when(relationshipService.getReceiveUpdateList(user.getEmail())).thenReturn(list);
+        when(relationshipService.findReceiveUpdateList(user.getEmail())).thenReturn(listReceiveUpload);
         MvcResult result = mockMvc.perform(post("/api/relationship/receiveUpdate")
                 .content(asJsonString(requestReciveUpdate))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -216,7 +216,7 @@ public class RelationshipControllerTest {
                 .andExpect(jsonPath("$.*", Matchers.hasSize(2))).andReturn();
         String content = result.getResponse().getContentAsString();
 
-        verify(relationshipService, times(1)).getReceiveUpdateList(user.getEmail());
+        verify(relationshipService, times(1)).findReceiveUpdateList(user.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
 }
