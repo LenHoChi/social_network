@@ -18,25 +18,26 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository usersRepository;
-    UserConvert userConvert;
     @Override
     public List<UserDTO> findAllUsers() {
-        return userConvert.listModelToListDTO(usersRepository.findAll());
+        return UserConvert.listModelToListDTO(usersRepository.findAll());
     }
 
     @Override
     public Optional<UserDTO> findUserById(String id) throws Exception {
-        if(usersRepository.findById(id).isPresent()){
-            return Optional.ofNullable(userConvert.modelToDTO(usersRepository.findById(id).get()));
-        }else{
-            throw new Exception("error");
-//            throw new NoSuchFieldException();
-        }
+        return Optional.of(usersRepository.findById(id).map(UserConvert::modelToDTO).orElseThrow(() -> new Exception("Error")));
+
+//        if(usersRepository.findById(id).isPresent()){
+//            return Optional.ofNullable(UserConvert.modelToDTO(usersRepository.findById(id).get()));
+//        }else{
+//            throw new Exception("error");
+////            throw new NoSuchFieldException();
+//        }
     }
 
     @Override
     public UserDTO saveUser(UserDTO userDTO) {
-        return userConvert.modelToDTO(usersRepository.save(userConvert.DTOToModel(userDTO)));
+        return UserConvert.modelToDTO(usersRepository.save(UserConvert.DTOToModel(userDTO)));
     }
 
     @Override

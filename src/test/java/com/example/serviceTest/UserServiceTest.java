@@ -78,7 +78,7 @@ public class UserServiceTest {
         when(userRepository.findById(user.getEmail())).thenReturn(Optional.of(user));
         doNothing().when(userRepository).delete(user);
         userService.deleteUser(user.getEmail());
-        verify(userRepository, times(1)).findById(user.getEmail());
+        verify(userRepository, times(2)).findById(user.getEmail());
         verify(userRepository, times(1)).delete(user);
     }
 }

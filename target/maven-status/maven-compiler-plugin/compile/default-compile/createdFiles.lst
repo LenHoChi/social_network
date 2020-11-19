@@ -12,6 +12,7 @@ com\example\filter\JWTLoginFilter.class
 com\example\model\AccountCredentials.class
 com\example\dto\RelationshipDTO.class
 com\example\exception\GlobalExceptionHandle.class
+com\example\utils\response\ResponseFriends$ResponseFriendsBuilder.class
 com\example\repository\RelationshipRepository.class
 com\example\TestRepositoryConfig.class
 com\example\utils\response\ResponseFriends.class

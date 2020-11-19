@@ -14,11 +14,6 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Rela
 //    @Query("select r.relationshipPK.friendEmail "
 //            + "from Relationship r "
 //            + "where r.relationshipPK.userEmail = :email "
-//            + "and r.areFriends = true "
-//            + "UNION "
-//            + "select r.relationshipPK.userEmail "
-//            + "from Relationship r "
-//            + "where r.relationshipPK.friendEmail = :email "
 //            + "and r.areFriends = true ")
 //    List<String> getFriendList(@Param("email") String email);
 

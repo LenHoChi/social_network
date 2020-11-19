@@ -24,5 +24,5 @@ public interface RelationshipService {
 
     Relationship toBlock(String email_requestor, String email_target) throws RelationshipException;
 
-    List<String> findReceiveUpdateList(String email);
+    List<String> findReceiveUpdateList(String email, String text);
 }

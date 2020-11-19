@@ -72,7 +72,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[1].email", is("len2")))
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)));
-        verify(userService, times(1)).findAllUsers();
+        verify(userService, times(2)).findAllUsers();
         verifyNoMoreInteractions(userService);
     }
 

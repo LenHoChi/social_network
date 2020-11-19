@@ -12,9 +12,12 @@ import com.example.utils.convert.RelationshipConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class RelationshipServiceImpl implements RelationshipService {
@@ -50,17 +53,17 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public Relationship getRelationship(RelationshipPK relationshipPK) throws Exception {
         Relationship relationship = null;
-            Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
-            if (relationshipRoot.isPresent()) {
-                relationship = relationshipRoot.get();
-                if (!relationship.getIsBlock()) {
-                    relationship.setAreFriends(true);
-                } else {
-                    throw new Exception("Error");
-                }
-            }else{
-                relationship = new Relationship(relationshipPK, true, false, false);
+        Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
+        if (relationshipRoot.isPresent()) {
+            relationship = relationshipRoot.get();
+            if (!relationship.getIsBlock()) {
+                relationship.setAreFriends(true);
+            } else {
+                throw new Exception("Error");
             }
+        } else {
+            relationship = new Relationship(relationshipPK, true, false, false);
+        }
         return relationship;
     }
 
@@ -90,7 +93,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         return lstCommonFriendList;
     }
-    public List<String> getCommonFriendList(List<String> emailList){
+
+    public List<String> getCommonFriendList(List<String> emailList) {
         List<String> lstEmailCommon = null;
         List<String> lstEmail1 = relationshipRepository.getFriendList(emailList.get(0));
         List<String> lstEmail2 = relationshipRepository.getFriendList(emailList.get(1));
@@ -98,6 +102,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         lstEmailCommon = lstEmail1;
         return lstEmailCommon;
     }
+
     @Override
     public Relationship beSubscriber(String email_requestor, String email_target) throws RelationshipException {
         Relationship relationship = null;
@@ -106,13 +111,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         if (userRepository.existsById(email_requestor) && userRepository.existsById(email_target)) {
             RelationshipPK relationshipPK = new RelationshipPK(email_requestor, email_target);
-                Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
-                if(relationshipRoot.isPresent()) {
-                    relationship = relationshipRoot.get();
-                    relationship.setIsSubscriber(true);
-                }else{
-                    relationship = new Relationship(relationshipPK, false, true, false);
-                }
+            Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
+            if (relationshipRoot.isPresent()) {
+                relationship = relationshipRoot.get();
+                relationship.setIsSubscriber(true);
+            } else {
+                relationship = new Relationship(relationshipPK, false, true, false);
+            }
             relationshipRepository.save(relationship);
         } else {
             throw new ResouceNotFoundException("email do not match");
@@ -128,18 +133,18 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         if (userRepository.existsById(email_requestor) && userRepository.existsById(email_target)) {
             RelationshipPK relationshipPK = new RelationshipPK(email_requestor, email_target);
-                Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
-                if(relationshipRoot.isPresent()) {
-                    relationship = relationshipRoot.get();
-                    relationship.setIsSubscriber(false);
-                    if (!relationship.getAreFriends()) {
-                        relationship.setIsBlock(true);
-                    } else {
-                        return relationship;
-                    }
-                }else{
-                    relationship = new Relationship(relationshipPK, false, false, true);
+            Optional<Relationship> relationshipRoot = relationshipRepository.findById(relationshipPK);
+            if (relationshipRoot.isPresent()) {
+                relationship = relationshipRoot.get();
+                relationship.setIsSubscriber(false);
+                if (!relationship.getAreFriends()) {
+                    relationship.setIsBlock(true);
+                } else {
+                    return relationship;
                 }
+            } else {
+                relationship = new Relationship(relationshipPK, false, false, true);
+            }
             relationshipRepository.save(relationship);
         } else {
             throw new ResouceNotFoundException("not found email matched");
@@ -148,13 +153,36 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public List<String> findReceiveUpdateList(String email) {
+    public List<String> findReceiveUpdateList(String email, String text) {
         List<String> lstReceiveUpdate = new ArrayList<>();
+        List<String> emailRelationship = splitString(text);
         if (userRepository.existsById(email)) {
             lstReceiveUpdate = relationshipRepository.getReceiveUpdatesList(email);
         } else {
             throw new ResouceNotFoundException("not found any email matched");
         }
+        for(int i=0;i<emailRelationship.size();i++){
+            lstReceiveUpdate.add(emailRelationship.get(i));
+        }
         return lstReceiveUpdate;
+    }
+
+    //'regard hochilen@gmail.com ok im fine thanks'
+    public List<String> splitString(String text) {
+        String[] arrRoot = text.split(" ");
+        List<String> lstEmail = new ArrayList<>();
+        for (int i = 0; i < arrRoot.length; i++) {
+            if (arrRoot[i].contains("@")&&checkMail(arrRoot[i])) {
+                lstEmail.add(arrRoot[i]);
+            }
+        }
+        return lstEmail;
+    }
+    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+            + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    public boolean checkMail(final String hex) {
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(hex);
+        return matcher.matches();
     }
 }

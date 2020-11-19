@@ -85,7 +85,7 @@ public class RelationshipControllerTest {
                 .andExpect(jsonPath("$[1].relationshipPK.userEmail", is("len2")))
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)));
-        verify(relationshipService, times(1)).findAllRelationships();
+        verify(relationshipService, times(2)).findAllRelationships();
         verifyNoMoreInteractions(relationshipService);
     }
     @Test
@@ -93,7 +93,7 @@ public class RelationshipControllerTest {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
         RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
         when(relationshipService.findRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
-        mockMvc.perform(post("/api/relationship/getRelationshipbyId")
+        mockMvc.perform(post("/api/relationship//find-relationship-by-id")
                 .content(asJsonString(relationshipPK))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -173,7 +173,7 @@ public class RelationshipControllerTest {
 
         when(relationshipService.beSubscriber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
 
-        mockMvc.perform(post("/api/relationship/beSubcriber")
+        mockMvc.perform(post("/api/relationship/beSubscriber")
                 .content(asJsonString(requestSubcriber))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -202,11 +202,12 @@ public class RelationshipControllerTest {
     @Test
     public void testReceiveUpdate() throws Exception{
         User user = new User("len1");
+        String text = "len";
         List<String> listReceiveUpload = new ArrayList<>();
-        listReceiveUpload.add("len");
-        RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail());
+        listReceiveUpload.add("len1");
+        RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail(),text);
 
-        when(relationshipService.findReceiveUpdateList(user.getEmail())).thenReturn(listReceiveUpload);
+        when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);
         MvcResult result = mockMvc.perform(post("/api/relationship/receiveUpdate")
                 .content(asJsonString(requestReciveUpdate))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -216,7 +217,7 @@ public class RelationshipControllerTest {
                 .andExpect(jsonPath("$.*", Matchers.hasSize(2))).andReturn();
         String content = result.getResponse().getContentAsString();
 
-        verify(relationshipService, times(1)).findReceiveUpdateList(user.getEmail());
+        verify(relationshipService, times(1)).findReceiveUpdateList(user.getEmail(),text);
         verifyNoMoreInteractions(relationshipService);
     }
 }

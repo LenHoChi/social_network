@@ -11,15 +11,11 @@ import com.example.utils.request.RequestReciveUpdate;
 import com.example.utils.request.RequestSubcriber;
 import com.example.utils.response.ResponseFriends;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/relationship")
@@ -48,8 +44,7 @@ public class RelationshipController {
     @PostMapping("")
     public ResponseEntity<?> beFriends(@Valid @RequestBody RequestFriends requestFriends) throws Exception {
         boolean success = relationshipService.beFriends(requestFriends.getEmails().get(0), requestFriends.getEmails().get(1));
-        ResponseFriends responseFriends = new ResponseFriends();
-        responseFriends.setSuccess(success);
+        ResponseFriends responseFriends = ResponseFriends.builder().success(success).build();
         return ResponseEntity.ok(responseFriends);
 //        Map<String, Object> body = new HashMap<>();
 //        body.put("Success", success);
@@ -102,10 +97,10 @@ public class RelationshipController {
     }
 
     //Cau6
-    //{"sender":"newmooncsu1@gmail.com"}
+    //{"sender":"newmooncsu1@gmail.com", "text":"ho fgf dfd@gmail.com"}
     @PostMapping("/receiveUpdate")
     public ResponseEntity<?> findReceiveUpdateList(@Valid @RequestBody RequestReciveUpdate requestReciveUpdate) {
-        List<String> lstRecipient = relationshipService.findReceiveUpdateList(requestReciveUpdate.getSender());
+        List<String> lstRecipient = relationshipService.findReceiveUpdateList(requestReciveUpdate.getSender(),requestReciveUpdate.getText());
         ResponseFriends responseFriends = new ResponseFriends();
         responseFriends.setSuccess(true);
         responseFriends.setRecipients(lstRecipient);
