@@ -10,17 +10,11 @@ import java.util.stream.Collectors;
 
 public class RelationshipConvert {
     static ModelMapper modelMapper = new ModelMapper();
-    public static RelationshipDTO modelToDTO(Relationship relationship){
+    public static RelationshipDTO convertModelToDTO(Relationship relationship){
         RelationshipDTO relationshipDTO = modelMapper.map(relationship, RelationshipDTO.class);
         return relationshipDTO;
     }
-    public static List<RelationshipDTO> listModelToListDTO(List<Relationship> list){
-        List<RelationshipDTO> list1 = new ArrayList<>();
+    public static List<RelationshipDTO> convertListModelToListDTO(List<Relationship> list){
         return list.stream().map(ele -> modelMapper.map(ele, RelationshipDTO.class)).collect(Collectors.toList());
-//        for(int i=0;i<list.size();i++){
-//            RelationshipDTO relationshipDTO = modelMapper.map(list.get(i), RelationshipDTO.class);
-//            list1.add(relationshipDTO);
-//        }
-//        return list1;
     }
 }

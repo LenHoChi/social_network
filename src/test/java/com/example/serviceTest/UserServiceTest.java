@@ -68,7 +68,7 @@ public class UserServiceTest {
     public void testCreateUser() throws Exception {
         User user = new User("len1");
         when(userRepository.save(user)).thenReturn(user);
-        UserDTO userDTO = userService.saveUser(UserConvert.modelToDTO(user));
+        UserDTO userDTO = userService.saveUser(UserConvert.convertModelToDTO(user));
         assertEquals(user.getEmail(), userDTO.getEmail());
     }
 

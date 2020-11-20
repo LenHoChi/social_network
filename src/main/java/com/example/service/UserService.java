@@ -12,7 +12,7 @@ public interface UserService {
 
     Optional<UserDTO> findUserById(String id) throws Exception;
 
-    UserDTO saveUser(UserDTO userDTO);
+    UserDTO saveUser(UserDTO userDTO) throws Exception;
 
     Map<String, Boolean> deleteUser(String userId) throws Exception;
 }

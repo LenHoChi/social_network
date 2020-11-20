@@ -5,10 +5,12 @@ import com.example.exception.RelationshipException;
 import com.example.exception.ResouceNotFoundException;
 import com.example.model.Relationship;
 import com.example.model.RelationshipPK;
+import com.example.model.User;
 import com.example.repository.RelationshipRepository;
 import com.example.repository.UserRepository;
 import com.example.service.RelationshipService;
 import com.example.utils.convert.RelationshipConvert;
+import com.example.utils.convert.UserConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,19 +28,32 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Autowired
     UserRepository userRepository;
     @Override
-    public Optional<RelationshipDTO> findRelationshipById(RelationshipPK relationshipPK) {
-        return Optional.ofNullable(RelationshipConvert.modelToDTO(relationshipRepository.findById(relationshipPK).get()));
+    public Optional<RelationshipDTO> findRelationshipById(RelationshipPK relationshipPK) throws Exception {
+        //return Optional.ofNullable(RelationshipConvert.convertModelToDTO((relationshipRepository.findById(relationshipPK).get())));
+        return Optional.of(relationshipRepository.findById(relationshipPK).map(RelationshipConvert::convertModelToDTO).orElseThrow(() -> new Exception("Error")));
     }
 
     @Override
     public List<RelationshipDTO> findAllRelationships() {
-        return RelationshipConvert.listModelToListDTO(relationshipRepository.findAll());
+        return RelationshipConvert.convertListModelToListDTO(relationshipRepository.findAll());
     }
 
+    private boolean checkSimilar(String emailUser, String friendEmail) {
+        List<Relationship> lstRelationships = relationshipRepository.findAll();
+        for (int i = 0; i < lstRelationships.size(); i++) {
+            if (lstRelationships.get(i).getRelationshipPK().getUserEmail().equalsIgnoreCase(emailUser)&&lstRelationships.get(i).getRelationshipPK().getFriendEmail().equalsIgnoreCase(friendEmail)) {
+                return false;
+            }
+        }
+        return true;
+    }
     @Override
     public Boolean beFriends(String userEmail, String friendEmail) throws Exception {
         if (userEmail.equalsIgnoreCase(friendEmail)) {
             throw new RelationshipException("two emails are same");
+        }
+        if(!checkSimilar(userEmail,friendEmail)){
+            throw new Exception("error (cause this relationship already)");
         }
         RelationshipPK relationshipPK = new RelationshipPK(userEmail, friendEmail);
         Relationship relationship = getRelationship(relationshipPK);
@@ -59,7 +74,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             if (!relationship.getIsBlock()) {
                 relationship.setAreFriends(true);
             } else {
-                throw new Exception("Error");
+                throw new Exception("Error cause this relationship is block");
             }
         } else {
             relationship = new Relationship(relationshipPK, true, false, false);
@@ -71,7 +86,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     public List<String> findFriendsList(String email) {
         List<String> lstFriendList = new ArrayList<>();
         if (userRepository.existsById(email)) {
-            lstFriendList = relationshipRepository.getFriendList(email);
+            lstFriendList = relationshipRepository.findFriendList(email);
         } else {
             throw new ResouceNotFoundException("Not found any email match with input");
         }
@@ -79,7 +94,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public List<String> findCommonFriendsList(List<String> emailList) throws RelationshipException {
+    public List<String> findCommonFriendsList(List<String> emailList) throws Exception {
         List<String> lstCommonFriendList = new ArrayList<>();
         if (emailList.get(0).equalsIgnoreCase(emailList.get(1))) {
             throw new RelationshipException("two emails are same");
@@ -96,8 +111,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     public List<String> getCommonFriendList(List<String> emailList) {
         List<String> lstEmailCommon = null;
-        List<String> lstEmail1 = relationshipRepository.getFriendList(emailList.get(0));
-        List<String> lstEmail2 = relationshipRepository.getFriendList(emailList.get(1));
+        List<String> lstEmail1 = relationshipRepository.findFriendList(emailList.get(0));
+        List<String> lstEmail2 = relationshipRepository.findFriendList(emailList.get(1));
         lstEmail1.retainAll(lstEmail2);
         lstEmailCommon = lstEmail1;
         return lstEmailCommon;
@@ -157,7 +172,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         List<String> lstReceiveUpdate = new ArrayList<>();
         List<String> emailRelationship = splitString(text);
         if (userRepository.existsById(email)) {
-            lstReceiveUpdate = relationshipRepository.getReceiveUpdatesList(email);
+            lstReceiveUpdate = relationshipRepository.findReceiveUpdatesList(email);
         } else {
             throw new ResouceNotFoundException("not found any email matched");
         }
@@ -168,7 +183,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     //'regard hochilen@gmail.com ok im fine thanks'
-    public List<String> splitString(String text) {
+    private List<String> splitString(String text) {
         String[] arrRoot = text.split(" ");
         List<String> lstEmail = new ArrayList<>();
         for (int i = 0; i < arrRoot.length; i++) {
@@ -180,9 +195,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-    public boolean checkMail(final String hex) {
+    private boolean checkMail(final String emailCheck) {
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(hex);
+        Matcher matcher = pattern.matcher(emailCheck);
         return matcher.matches();
     }
 }

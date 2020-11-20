@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) throws Exception {
         return ResponseEntity.ok(userService.saveUser(userDTO));
     }
 

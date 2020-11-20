@@ -5,11 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    @Email(message = "error email")
+    @NotEmpty(message = "mail not empty")
+    @Email(message = "error email dto")
+    @NotNull(message = "not null for this data")
     private String email;
 }

@@ -1,33 +1,25 @@
 package com.example.controllerTest;
 
-import com.example.TestRepositoryConfig;
 import com.example.controller.RelationshipController;
-import com.example.controller.UserController;
 import com.example.dto.RelationshipDTO;
-import com.example.dto.UserDTO;
 import com.example.model.Relationship;
 import com.example.model.RelationshipPK;
 import com.example.model.User;
-import com.example.repository.RelationshipRepository;
 import com.example.service.RelationshipService;
 import com.example.service.UserService;
-import com.example.utils.request.RequestFriends;
-import com.example.utils.request.RequestFriendsList;
-import com.example.utils.request.RequestReciveUpdate;
-import com.example.utils.request.RequestSubcriber;
+import com.example.model.request.RequestFriends;
+import com.example.model.request.RequestFriendsList;
+import com.example.model.request.RequestReciveUpdate;
+import com.example.model.request.RequestSubcriber;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -39,7 +31,6 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -93,7 +84,7 @@ public class RelationshipControllerTest {
         RelationshipPK relationshipPK = new RelationshipPK("newmooncsu@gmail.com", "newmooncsu2@gmail.com");
         RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
         when(relationshipService.findRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
-        mockMvc.perform(post("/api/relationship//find-relationship-by-id")
+        mockMvc.perform(post("/api/relationship/find-relationship-by-id")
                 .content(asJsonString(relationshipPK))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -133,7 +124,7 @@ public class RelationshipControllerTest {
         listEmail.add("len10");
         when(relationshipService.findFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
 
-        mockMvc.perform(post("/api/relationship/friendsList")
+        mockMvc.perform(post("/api/relationship/friends-list")
                 .content(asJsonString(requestFriendsList))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -153,7 +144,7 @@ public class RelationshipControllerTest {
         lstEmail.add("len2");
 
         when(relationshipService.findCommonFriendsList(lstEmail)).thenReturn(lstEmail);
-        mockMvc.perform(post("/api/relationship/commonFriendsList")
+        mockMvc.perform(post("/api/relationship/common-friends-list")
                 .content(asJsonString(requestFriends))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -173,7 +164,7 @@ public class RelationshipControllerTest {
 
         when(relationshipService.beSubscriber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
 
-        mockMvc.perform(post("/api/relationship/beSubscriber")
+        mockMvc.perform(post("/api/relationship/be-subscriber")
                 .content(asJsonString(requestSubcriber))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -190,7 +181,7 @@ public class RelationshipControllerTest {
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
         when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
-        mockMvc.perform(post("/api/relationship/toBlock")
+        mockMvc.perform(post("/api/relationship/to-block")
                 .content(asJsonString(requestSubcriber))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -208,7 +199,7 @@ public class RelationshipControllerTest {
         RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail(),text);
 
         when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);
-        MvcResult result = mockMvc.perform(post("/api/relationship/receiveUpdate")
+        MvcResult result = mockMvc.perform(post("/api/relationship/receive-update")
                 .content(asJsonString(requestReciveUpdate))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -27,7 +27,7 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Rela
             "where r.friend_Email = :email\n" +
             "and r.areFriends = true ";
     @Query(value = findQuery, nativeQuery = true)
-    List<String> getFriendList(@Param("email") String email);
+    List<String> findFriendList(@Param("email") String email);
 
 //    @Query("SELECT r.relationshipPK.friendEmail "
 //            + "FROM Relationship r "
@@ -43,5 +43,5 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Rela
             + "and (r.areFriends = true "
             + "or r.isSubscriber = true) "
             + "and r.isBlock = false")
-    List<String> getReceiveUpdatesList(@Param("email") String email);
+    List<String> findReceiveUpdatesList(@Param("email") String email);
 }

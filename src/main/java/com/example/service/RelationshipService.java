@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface RelationshipService {
-    Optional<RelationshipDTO> findRelationshipById(RelationshipPK relationshipPK);
+    Optional<RelationshipDTO> findRelationshipById(RelationshipPK relationshipPK) throws Exception;
 
     List<RelationshipDTO> findAllRelationships();
 
@@ -18,7 +18,7 @@ public interface RelationshipService {
 
     List<String> findFriendsList(String email);
 
-    List<String> findCommonFriendsList(List<String> emailList) throws RelationshipException;
+    List<String> findCommonFriendsList(List<String> emailList) throws Exception;
 
     Relationship beSubscriber(String email_requestor, String email_target) throws RelationshipException;
 

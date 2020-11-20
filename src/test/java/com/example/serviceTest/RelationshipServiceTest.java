@@ -163,7 +163,7 @@ public class RelationshipServiceTest {
 
         User user = new User("len1");
 
-        when(relationshipRepository.getFriendList(user.getEmail())).thenReturn(lstFriend);
+        when(relationshipRepository.findFriendList(user.getEmail())).thenReturn(lstFriend);
 
         when(userRepository.existsById(user.getEmail())).thenReturn(true);
         List<String> lstTest = relationshipService.findFriendsList(user.getEmail());
@@ -178,7 +178,7 @@ public class RelationshipServiceTest {
 
         User user = new User("len1");
 
-        when(relationshipRepository.getFriendList(user.getEmail())).thenReturn(lstFriend);
+        when(relationshipRepository.findFriendList(user.getEmail())).thenReturn(lstFriend);
 
         when(userRepository.existsById(user.getEmail())).thenReturn(false);
         Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.findFriendsList(user.getEmail()));
@@ -192,7 +192,7 @@ public class RelationshipServiceTest {
         lstCommonFriend.add("len10");
         lstCommonFriend.add("len1");
         List<String> lstTest = new ArrayList<>();
-        when(relationshipRepository.getFriendList(Mockito.anyString())).thenReturn(lstCommonFriend);
+        when(relationshipRepository.findFriendList(Mockito.anyString())).thenReturn(lstCommonFriend);
         when(userRepository.existsById(Mockito.anyString())).thenReturn(true);
         lstTest = relationshipService.findCommonFriendsList(lstCommonFriend);
 
@@ -357,7 +357,7 @@ public class RelationshipServiceTest {
         lstTemp.add("len1");
         String text = "fdf len@gmail.com";
         User user1 = new User("len1");
-        when(relationshipRepository.getReceiveUpdatesList(user1.getEmail())).thenReturn(lstTemp);
+        when(relationshipRepository.findReceiveUpdatesList(user1.getEmail())).thenReturn(lstTemp);
         when(userRepository.existsById(user1.getEmail())).thenReturn(true);
         List<String> lstTest = relationshipService.findReceiveUpdateList(user1.getEmail(),text);
         assertEquals(3, lstTest.size());
@@ -370,7 +370,7 @@ public class RelationshipServiceTest {
         lstTemp.add("len1");
         String text = "fdf len@gmail";
         User user1 = new User("len1");
-        when(relationshipRepository.getReceiveUpdatesList(user1.getEmail())).thenReturn(lstTemp);
+        when(relationshipRepository.findReceiveUpdatesList(user1.getEmail())).thenReturn(lstTemp);
         when(userRepository.existsById(user1.getEmail())).thenReturn(true);
         List<String> lstTest = relationshipService.findReceiveUpdateList(user1.getEmail(),text);
         assertEquals(2, lstTest.size());
@@ -384,7 +384,7 @@ public class RelationshipServiceTest {
         String text = "len";
         User user1 = new User("len1");
 
-        when(relationshipRepository.getReceiveUpdatesList(user1.getEmail())).thenReturn(lstTemp);
+        when(relationshipRepository.findReceiveUpdatesList(user1.getEmail())).thenReturn(lstTemp);
         when(userRepository.existsById(user1.getEmail())).thenReturn(false);
         Throwable exception = assertThrows(ResouceNotFoundException.class, () -> relationshipService.findReceiveUpdateList(user1.getEmail(),text));
         assertEquals("not found any email matched", exception.getMessage());
