@@ -93,16 +93,48 @@ public class RelationshipControllerTest {
         verify(relationshipService, times(1)).findRelationshipById(relationshipPK);
         verifyNoMoreInteractions(relationshipService);
     }
-
+    @Test
+    public void testGetRelationshipFailByEmailWrongFormat() throws Exception {
+        RelationshipPK relationshipPK = new RelationshipPK("newmooncsu", "newmooncsu2");
+        RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
+        when(relationshipService.findRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
+        mockMvc.perform(post("/api/relationship/find-relationship-by-id")
+                .content(asJsonString(relationshipPK))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testGetRelationshipFailByEmailNull() throws Exception {
+        RelationshipPK relationshipPK = new RelationshipPK(null, null);
+        RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
+        when(relationshipService.findRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
+        mockMvc.perform(post("/api/relationship/find-relationship-by-id")
+                .content(asJsonString(relationshipPK))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testGetRelationshipFailByEmailEmpty() throws Exception {
+        RelationshipPK relationshipPK = new RelationshipPK("", "");
+        RelationshipDTO relationshipDTO = new RelationshipDTO(relationshipPK, true, false, false);
+        when(relationshipService.findRelationshipById(relationshipPK)).thenReturn(Optional.of(relationshipDTO));
+        mockMvc.perform(post("/api/relationship/find-relationship-by-id")
+                .content(asJsonString(relationshipPK))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
     @Test
     public void testBeFriends() throws Exception {
         List<String> listEmail = new ArrayList<>();
-        listEmail.add("len1");
-        listEmail.add("len10");
+        listEmail.add("newmooncsu@gmail.com");
+        listEmail.add("newmooncsu1@gmail.com");
         RequestFriends requestFriends = new RequestFriends(listEmail);
 
-        User user1 = new User("len1");
-        User user2 = new User("len10");
+        User user1 = new User("newmooncsu@gmail.com");
+        User user2 = new User("newmooncsu1@gmail.com");
 
         when(relationshipService.beFriends(user1.getEmail(), user2.getEmail())).thenReturn(true);
         mockMvc.perform(post("/api/relationship")
@@ -113,15 +145,31 @@ public class RelationshipControllerTest {
         verify(relationshipService, times(1)).beFriends(user1.getEmail(), user2.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
+    @Test
+    public void testBeFriendsFailByEmailWrongFormat() throws Exception {
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("newmooncsu");
+        listEmail.add("newmooncsu1");
+        RequestFriends requestFriends = new RequestFriends(listEmail);
 
+        User user1 = new User("newmooncsu");
+        User user2 = new User("newmooncsu1");
+
+        when(relationshipService.beFriends(user1.getEmail(), user2.getEmail())).thenReturn(true);
+        mockMvc.perform(post("/api/relationship")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
     @Test
     public void testGetFriendsList() throws Exception {
-        User user1 = new User("len1");
+        User user1 = new User("newmooncsu@gmail.com");
         RequestFriendsList requestFriendsList = new RequestFriendsList(user1.getEmail());
 
         List<String> listEmail = new ArrayList<>();
-        listEmail.add("len1");
-        listEmail.add("len10");
+        listEmail.add("newmooncsu@gmail.com");
+        listEmail.add("newmooncsu1@gmail.com");
         when(relationshipService.findFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
 
         mockMvc.perform(post("/api/relationship/friends-list")
@@ -133,15 +181,31 @@ public class RelationshipControllerTest {
         verifyNoMoreInteractions(relationshipService);
     }
     @Test
+    public void testGetFriendsListFailByEmailWrongFormat() throws Exception {
+        User user1 = new User("newmooncsu");
+        RequestFriendsList requestFriendsList = new RequestFriendsList(user1.getEmail());
+
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("newmooncsu");
+        listEmail.add("newmooncsu1");
+        when(relationshipService.findFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
+
+        mockMvc.perform(post("/api/relationship/friends-list")
+                .content(asJsonString(requestFriendsList))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
     public void testGetCommonFriendsList() throws Exception{
         List<String> listEmail = new ArrayList<>();
-        listEmail.add("len1");
-        listEmail.add("len2");
+        listEmail.add("newmooncsu@gmail.com");
+        listEmail.add("newmooncsu1@gmail.com");
         RequestFriends requestFriends = new RequestFriends(listEmail);
 
         List<String> lstEmail = new ArrayList<>();
-        lstEmail.add("len1");
-        lstEmail.add("len2");
+        lstEmail.add("newmooncsu@gmail.com");
+        lstEmail.add("newmooncsu1@gmail.com");
 
         when(relationshipService.findCommonFriendsList(lstEmail)).thenReturn(lstEmail);
         mockMvc.perform(post("/api/relationship/common-friends-list")
@@ -152,13 +216,30 @@ public class RelationshipControllerTest {
         verify(relationshipService, times(1)).findCommonFriendsList(lstEmail);
         verifyNoMoreInteractions(relationshipService);
     }
+    @Test
+    public void testGetCommonFriendsListFailByEmailWrongFormat() throws Exception{
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("newmooncsu");
+        listEmail.add("newmooncsu1");
+        RequestFriends requestFriends = new RequestFriends(listEmail);
 
+        List<String> lstEmail = new ArrayList<>();
+        lstEmail.add("newmooncsu");
+        lstEmail.add("newmooncsu1");
+
+        when(relationshipService.findCommonFriendsList(lstEmail)).thenReturn(lstEmail);
+        mockMvc.perform(post("/api/relationship/common-friends-list")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
     @Test
     public void testBeSubscriber() throws  Exception{
         Relationship relationship =new Relationship();
 
-        User user1 = new User("len1");
-        User user2 = new User("len10");
+        User user1 = new User("newmooncsu@gmail.com");
+        User user2 = new User("newmooncsu1@gmail.com");
 
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
@@ -174,10 +255,27 @@ public class RelationshipControllerTest {
     }
 
     @Test
+    public void testBeSubscriberFailByEmailWrongFormat() throws  Exception{
+        Relationship relationship =new Relationship();
+
+        User user1 = new User("newmooncsu");
+        User user2 = new User("newmooncsu1");
+
+        RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
+
+        when(relationshipService.beSubscriber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+
+        mockMvc.perform(post("/api/relationship/be-subscriber")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
     public void testToBlock() throws Exception{
         Relationship relationship =new Relationship();
-        User user1 = new User("len1");
-        User user2 = new User("len10");
+        User user1 = new User("newmooncsu@gmail.com");
+        User user2 = new User("newmooncsu1@gmail.com");
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
         when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
@@ -189,13 +287,26 @@ public class RelationshipControllerTest {
         verify(relationshipService, times(1)).toBlock(user1.getEmail(), user2.getEmail());
         verifyNoMoreInteractions(relationshipService);
     }
+    @Test
+    public void testToBlockFailByEmailWrongFormat() throws Exception{
+        Relationship relationship =new Relationship();
+        User user1 = new User("newmooncsu");
+        User user2 = new User("newmooncsu1");
+        RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
+        when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+        mockMvc.perform(post("/api/relationship/to-block")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
     @Test
     public void testReceiveUpdate() throws Exception{
-        User user = new User("len1");
-        String text = "len";
+        User user = new User("newmooncsu@gmail.com");
+        String text = "newmooncs1u@gmail.com";
         List<String> listReceiveUpload = new ArrayList<>();
-        listReceiveUpload.add("len1");
+        listReceiveUpload.add("newmooncsu@gmail.com");
         RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail(),text);
 
         when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);
@@ -210,5 +321,21 @@ public class RelationshipControllerTest {
 
         verify(relationshipService, times(1)).findReceiveUpdateList(user.getEmail(),text);
         verifyNoMoreInteractions(relationshipService);
+    }
+    @Test
+    public void testReceiveUpdateFailByEmailWrongFormat() throws Exception{
+        User user = new User("newmooncsu");
+        String text = "newmooncs1u";
+        List<String> listReceiveUpload = new ArrayList<>();
+        listReceiveUpload.add("newmooncsu");
+        RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail(),text);
+
+        when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);
+        MvcResult result = mockMvc.perform(post("/api/relationship/receive-update")
+                .content(asJsonString(requestReciveUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json")).andReturn();
+        String content = result.getResponse().getContentAsString();
     }
 }

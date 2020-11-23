@@ -4,7 +4,9 @@ import com.example.model.Relationship;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.service.RelationshipService;
+import com.example.service.UserService;
 import com.example.service.impl.RelationshipServiceImpl;
+import com.example.utils.convert.UserConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +22,7 @@ import javax.persistence.EntityManager;
 
 public class SocialNetworkApplication implements CommandLineRunner {
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
     public static void main(String[] args) {
         SpringApplication.run(SocialNetworkApplication.class, args);
     }
@@ -30,8 +32,12 @@ public class SocialNetworkApplication implements CommandLineRunner {
         User user1 = new User("zoombiev1@gmail.com");
         User user2 = new User("zoombiev2@gmail.com");
         User user3 = new User("zoombiev1@gmail.com");
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
+//        userService.saveUser(UserConvert.convertModelToDTO(user1));
+//        userService.saveUser(UserConvert.convertModelToDTO(user2));
+//        userService.saveUser(UserConvert.convertModelToDTO(user3));
+
+//        userService.deleteUser(user1.getEmail());
+//        userService.deleteUser(user2.getEmail());
+//        userService.deleteUser(user1.getEmail());
     }
 }

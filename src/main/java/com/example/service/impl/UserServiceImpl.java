@@ -1,6 +1,8 @@
 package com.example.service.impl;
 
 import com.example.dto.UserDTO;
+import com.example.exception.RelationshipException;
+import com.example.exception.ResouceNotFoundException;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.service.UserService;
@@ -15,7 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Transactional(rollbackFor = Exception.class)
+//propagation = Propagation.REQUIRED tao moi transaction neu chua co
+//Propagation.REQUIRED_NEW tao moi transaction bat ke ly do
+@Transactional(rollbackFor = Exception.class) //roll back voi all exception, error
+//@Transactional(readOnly = true) //ko cho sua
+//@Transactional //tu dong update mean :@Transactional(rollbackFor = { RuntimeException.class, Error.class }) chi bat dung 2 thang nay. exception ko bat
+//@Transactional(noRollbackFor = Exception.class)//ko rollback voi exception but voi error thi rollback
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -28,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> findUserById(String id) throws Exception {
-        return Optional.of(usersRepository.findById(id).map(UserConvert::convertModelToDTO).orElseThrow(() -> new Exception("Error")));
+        return Optional.of(usersRepository.findById(id).map(UserConvert::convertModelToDTO).orElseThrow(() -> new Exception("Error not found")));
 
 //        if(usersRepository.findById(id).isPresent()){
 //            return Optional.ofNullable(UserConvert.modelToDTO(usersRepository.findById(id).get()));
@@ -47,6 +54,7 @@ public class UserServiceImpl implements UserService {
         }
         return true;
     }
+
     //---> kết luận @valid chỉ xài cho input
     //còn @email đặt ở model thì gọi khi save nhung no ko bug ra loi trong message
     @Override
@@ -69,5 +77,69 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new Exception("error (cause this email not exists)");
         }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+//-------------test transaction-----------------------------------------------------------------------
+    @Override
+    public void testTransactionalException() throws Exception {
+        User user1 = new User("zoombiev1@gmail.com");
+        User user2 = new User("zoombiev2@gmail.com");
+        usersRepository.save(user1);
+        usersRepository.save(user2);
+        this.demoException();
+
+//        usersRepository.deleteById(user1.getEmail());
+//        usersRepository.deleteById(user2.getEmail());
+//        usersRepository.deleteById(user1.getEmail());
+    }
+
+    @Override
+    public void testTransactionalNoException() throws Exception {
+        User user1 = new User("zoombiev1@gmail.com");
+        User user2 = new User("zoombiev2@gmail.com");
+        usersRepository.save(user1);
+        usersRepository.save(user2);
+        this.demoException();
+    }
+
+    @Override
+    public void testTransactionalReadOnly() throws Exception {
+        User user1 = new User("zoombiev1@gmail.com");
+        User user2 = new User("zoombiev2@gmail.com");
+        usersRepository.save(user1);
+        usersRepository.save(user2);
+        usersRepository.save(user2);
+    }
+
+    @Override
+    public void testTransactional() throws Exception {
+//        Optional<User> user = usersRepository.findById("zoombiev1@gmail.com");
+//        user.get().setEmail("len@gmail.com");
+//        usersRepository.save(user.get());
+
+        User user1 = new User("zoombiev1@gmail.com");
+        User user2 = new User("zoombiev2@gmail.com");
+        usersRepository.save(user1);
+        usersRepository.save(user2);
+        this.demoException();
+    }
+
+    public void demoException() throws Exception {
+        throw new Exception("demo throw exception");
+       //throw new Error("df");
+        //throw new RuntimeException("dfdfd");
+
     }
 }

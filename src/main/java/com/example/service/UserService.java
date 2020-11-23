@@ -2,11 +2,11 @@ package com.example.service;
 
 import com.example.dto.UserDTO;
 import com.example.model.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 public interface UserService {
     List<UserDTO> findAllUsers();
 
@@ -15,4 +15,9 @@ public interface UserService {
     UserDTO saveUser(UserDTO userDTO) throws Exception;
 
     Map<String, Boolean> deleteUser(String userId) throws Exception;
+
+    void testTransactionalException() throws Exception;
+    void testTransactionalNoException() throws Exception;
+    void testTransactionalReadOnly() throws Exception;
+    void testTransactional() throws Exception;
 }

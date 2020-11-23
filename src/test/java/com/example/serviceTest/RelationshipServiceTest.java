@@ -96,6 +96,23 @@ public class RelationshipServiceTest {
         assertEquals("two emails are same", exception.getMessage());
 
     }
+    //tc3 -- already relationship
+    @Test
+    public void testBeFriendsAlready() throws Exception {
+        RelationshipPK relationshipPK = new RelationshipPK("len1", "len2");
+        Relationship relationship = new Relationship(relationshipPK, true, false, false);
+        List<Relationship> lstTest = new ArrayList<>();
+        lstTest.add(relationship);
+        User user1 = new User("len1");
+        User user2 = new User("len2");
+
+
+        when(relationshipRepository.save(Mockito.any(Relationship.class))).thenReturn(relationship);
+        when(relationshipRepository.findAll()).thenReturn(lstTest);
+        Throwable exception = assertThrows(Exception.class, () -> relationshipService.beFriends(user1.getEmail(), user2.getEmail()));
+        assertEquals("error (cause this relationship already)", exception.getMessage());
+
+    }
     //test for getRelationship
     //tc1 -- exists relationship happy case
     @Test
@@ -134,7 +151,7 @@ public class RelationshipServiceTest {
 
         when(relationshipRepository.findById(relationshipPK)).thenReturn(Optional.of(relationship));
         Throwable exception = assertThrows(Exception.class, () -> relationshipService.getRelationship(relationshipPK));
-        assertEquals("Error", exception.getMessage());
+        assertEquals("Error cause this relationship is block", exception.getMessage());
 //        Relationship relationship1 = relationshipServiceImpl.getRelationship(relationshipPK);
 //        assertNull(relationship1);
     }
@@ -170,7 +187,7 @@ public class RelationshipServiceTest {
 
         assertEquals(lstFriend.size(), lstTest.size());
     }
-    //tc2 unhappy case
+    //tc2 unhappy case not found
     @Test
     public void testGetFriendsListError() throws Exception{
         List<String> lstFriend = new ArrayList<>();

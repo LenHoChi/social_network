@@ -42,4 +42,10 @@ public class UserController {
     public ResponseEntity<?> findUserById(@PathVariable(value = "id") String id) throws Exception {
         return ResponseEntity.ok(userService.findUserById(id));
     }
+
+    @GetMapping("/len")
+    public ResponseEntity<?> testTransactional() throws Exception {
+        userService.testTransactional();
+        return ResponseEntity.ok(true);
+    }
 }

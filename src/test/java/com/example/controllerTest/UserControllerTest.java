@@ -87,7 +87,6 @@ public class UserControllerTest {
         verify(userService, times(1)).findUserById(userDTO.getEmail());
         verifyNoMoreInteractions(userService);
     }
-
     @Test
     public void testCreateUser() throws Exception {
         UserDTO userDTO = new UserDTO("newmooncsu@gmail.com");
@@ -103,7 +102,18 @@ public class UserControllerTest {
         verify(userService, times(1)).saveUser(userDTO);
         verifyNoMoreInteractions(userService);
     }
+    @Test
+    public void testCreateUserByEmailWrongFormat() throws Exception {
+        UserDTO userDTO = new UserDTO("newmooncs");
 
+        when(userService.saveUser(Mockito.any(UserDTO.class))).thenReturn(userDTO);
+        // given(userService.saveUser(any(UserDTO.class))).willReturn(userDTO);
+        mockMvc.perform(post("/api/users")
+                .content(asJsonString(userDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
     @Test
     public void testDeleteUser() throws Exception {
         UserDTO userDTO = new UserDTO("len1");
