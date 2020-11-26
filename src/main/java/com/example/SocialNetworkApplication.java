@@ -17,6 +17,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 
@@ -28,16 +30,9 @@ public class SocialNetworkApplication implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Hello world!");
-        User user1 = new User("zoombiev1@gmail.com");
-        User user2 = new User("zoombiev2@gmail.com");
-        User user3 = new User("zoombiev1@gmail.com");
-//        userService.saveUser(UserConvert.convertModelToDTO(user1));
-//        userService.saveUser(UserConvert.convertModelToDTO(user2));
-//        userService.saveUser(UserConvert.convertModelToDTO(user3));
-
-//        userService.deleteUser(user1.getEmail());
-//        userService.deleteUser(user2.getEmail());
-//        userService.deleteUser(user1.getEmail());
+        List<String> lst = new ArrayList<>();
+        lst.add("len");
+        lst.add("len2");
+        lst.stream().map(e-> e.toUpperCase()).forEach(System.out::println);
     }
 }

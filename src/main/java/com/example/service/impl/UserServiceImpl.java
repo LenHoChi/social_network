@@ -19,10 +19,10 @@ import java.util.Optional;
 
 //propagation = Propagation.REQUIRED tao moi transaction neu chua co
 //Propagation.REQUIRED_NEW tao moi transaction bat ke ly do
-@Transactional(rollbackFor = Exception.class) //roll back voi all exception, error
 //@Transactional(readOnly = true) //ko cho sua
 //@Transactional //tu dong update mean :@Transactional(rollbackFor = { RuntimeException.class, Error.class }) chi bat dung 2 thang nay. exception ko bat
 //@Transactional(noRollbackFor = Exception.class)//ko rollback voi exception but voi error thi rollback
+@Transactional(rollbackFor = Exception.class) //roll back voi all exception, error
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired

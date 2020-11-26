@@ -15,8 +15,9 @@ public class UserConvert {
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         return userDTO;
     }
-    public static List<UserDTO> convertListModelToListDTO(List<User> list){
-        return list.stream().map(ele -> modelMapper.map(ele, UserDTO.class)).collect(Collectors.toList());
+    public static List<UserDTO> convertListModelToListDTO(List<User> listUser){
+        return listUser.stream().map(ele -> modelMapper.map(ele, UserDTO.class)).collect(Collectors.toList());
+        //return listUser.stream().map(UserConvert::convertModelToDTO).collect(Collectors.toList());
     }
     public static User convertDTOToModel(UserDTO userDTO){
         User user = modelMapper.map(userDTO, User.class);
