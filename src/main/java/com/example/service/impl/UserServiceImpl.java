@@ -1,15 +1,12 @@
 package com.example.service.impl;
 
 import com.example.dto.UserDTO;
-import com.example.exception.RelationshipException;
-import com.example.exception.ResouceNotFoundException;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.service.UserService;
 import com.example.utils.convert.UserConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;

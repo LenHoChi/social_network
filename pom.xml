@@ -102,6 +102,12 @@
             <artifactId>auth0-spring-security-api</artifactId>
             <version>1.0.0-rc.2</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.stormpath.spring</groupId>-->
+<!--            <artifactId>stormpath-default-spring-boot-starter</artifactId>-->
+<!--            <version>1.0.RC9.2</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
