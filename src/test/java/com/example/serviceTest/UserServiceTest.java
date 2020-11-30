@@ -1,6 +1,5 @@
 package com.example.serviceTest;
 
-import com.example.TestRepositoryConfig;
 import com.example.dto.UserDTO;
 import com.example.exception.ResouceNotFoundException;
 import com.example.model.User;

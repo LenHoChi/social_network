@@ -1,6 +1,5 @@
 package com.example.serviceTest;
 
-import com.example.TestRepositoryConfig;
 import com.example.dto.RelationshipDTO;
 import com.example.dto.UserDTO;
 import com.example.exception.RelationshipException;

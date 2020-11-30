@@ -1,7 +1,6 @@
 package com.example.controllerTest;
 
 import com.example.SocialNetworkApplication;
-import com.example.TestRepositoryConfig;
 import com.example.controller.UserController;
 import com.example.dto.UserDTO;
 import com.example.service.UserService;
