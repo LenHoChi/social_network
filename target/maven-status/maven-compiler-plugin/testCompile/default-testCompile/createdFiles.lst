@@ -1,0 +1,5 @@
+com\example\controllerTest\UserControllerTest.class
+com\example\serviceTest\RelationshipServiceTest.class
+com\example\controllerTest\RelationshipControllerTest.class
+com\example\serviceTest\UserServiceTest.class
+com\example\SocialNetworkApplicationTest.class

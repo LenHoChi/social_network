@@ -16,6 +16,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(RelationshipController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class RelationshipControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -163,6 +165,40 @@ public class RelationshipControllerTest {
                 .andExpect(content().contentType("application/json"));
     }
     @Test
+    public void testBeFriendsFailByEmailNull() throws Exception {
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add(null);
+        listEmail.add(null);
+        RequestFriends requestFriends = new RequestFriends(listEmail);
+
+        User user1 = new User("newmooncsu");
+        User user2 = new User("newmooncsu1");
+
+        when(relationshipService.beFriends(user1.getEmail(), user2.getEmail())).thenReturn(true);
+        mockMvc.perform(post("/api/relationship")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testBeFriendsFailByEmailEmpty() throws Exception {
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("");
+        listEmail.add("");
+        RequestFriends requestFriends = new RequestFriends(listEmail);
+
+        User user1 = new User("newmooncsu");
+        User user2 = new User("newmooncsu1");
+
+        when(relationshipService.beFriends(user1.getEmail(), user2.getEmail())).thenReturn(true);
+        mockMvc.perform(post("/api/relationship")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
     public void testGetFriendsList() throws Exception {
         User user1 = new User("newmooncsu@gmail.com");
         RequestFriendsList requestFriendsList = new RequestFriendsList(user1.getEmail());
@@ -197,6 +233,38 @@ public class RelationshipControllerTest {
                 .andExpect(content().contentType("application/json"));
     }
     @Test
+    public void testGetFriendsListFailByEmailNull() throws Exception {
+        User user1 = new User("newmooncsu");
+        RequestFriendsList requestFriendsList = new RequestFriendsList(user1.getEmail());
+
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add(null);
+        listEmail.add(null);
+        when(relationshipService.findFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
+
+        mockMvc.perform(post("/api/relationship/friends-list")
+                .content(asJsonString(requestFriendsList))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testGetFriendsListFailByEmailEmpty() throws Exception {
+        User user1 = new User("newmooncsu");
+        RequestFriendsList requestFriendsList = new RequestFriendsList(user1.getEmail());
+
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("");
+        listEmail.add("");
+        when(relationshipService.findFriendsList(requestFriendsList.getEmail())).thenReturn(listEmail);
+
+        mockMvc.perform(post("/api/relationship/friends-list")
+                .content(asJsonString(requestFriendsList))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
     public void testGetCommonFriendsList() throws Exception{
         List<String> listEmail = new ArrayList<>();
         listEmail.add("newmooncsu@gmail.com");
@@ -221,6 +289,42 @@ public class RelationshipControllerTest {
         List<String> listEmail = new ArrayList<>();
         listEmail.add("newmooncsu");
         listEmail.add("newmooncsu1");
+        RequestFriends requestFriends = new RequestFriends(listEmail);
+
+        List<String> lstEmail = new ArrayList<>();
+        lstEmail.add("newmooncsu");
+        lstEmail.add("newmooncsu1");
+
+        when(relationshipService.findCommonFriendsList(lstEmail)).thenReturn(lstEmail);
+        mockMvc.perform(post("/api/relationship/common-friends-list")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testGetCommonFriendsListFailByEmailNull() throws Exception{
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add(null);
+        listEmail.add(null);
+        RequestFriends requestFriends = new RequestFriends(listEmail);
+
+        List<String> lstEmail = new ArrayList<>();
+        lstEmail.add("newmooncsu");
+        lstEmail.add("newmooncsu1");
+
+        when(relationshipService.findCommonFriendsList(lstEmail)).thenReturn(lstEmail);
+        mockMvc.perform(post("/api/relationship/common-friends-list")
+                .content(asJsonString(requestFriends))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testGetCommonFriendsListFailByEmailEmpty() throws Exception{
+        List<String> listEmail = new ArrayList<>();
+        listEmail.add("");
+        listEmail.add("");
         RequestFriends requestFriends = new RequestFriends(listEmail);
 
         List<String> lstEmail = new ArrayList<>();
@@ -272,6 +376,40 @@ public class RelationshipControllerTest {
                 .andExpect(content().contentType("application/json"));
     }
     @Test
+    public void testBeSubscriberFailByEmailNull() throws  Exception{
+        Relationship relationship =new Relationship();
+
+        User user1 = new User("");
+        User user2 = new User("");
+
+        RequestSubcriber requestSubcriber = new RequestSubcriber(null, null);
+
+        when(relationshipService.beSubscriber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+
+        mockMvc.perform(post("/api/relationship/be-subscriber")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testBeSubscriberFailByEmailEmpty() throws  Exception{
+        Relationship relationship =new Relationship();
+
+        User user1 = new User("");
+        User user2 = new User("");
+
+        RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
+
+        when(relationshipService.beSubscriber(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+
+        mockMvc.perform(post("/api/relationship/be-subscriber")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
     public void testToBlock() throws Exception{
         Relationship relationship =new Relationship();
         User user1 = new User("newmooncsu@gmail.com");
@@ -292,6 +430,34 @@ public class RelationshipControllerTest {
         Relationship relationship =new Relationship();
         User user1 = new User("newmooncsu");
         User user2 = new User("newmooncsu1");
+        RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
+
+        when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+        mockMvc.perform(post("/api/relationship/to-block")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testToBlockFailByEmailNull() throws Exception{
+        Relationship relationship =new Relationship();
+        User user1 = new User("null");
+        User user2 = new User("null");
+        RequestSubcriber requestSubcriber = new RequestSubcriber(null, null);
+
+        when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
+        mockMvc.perform(post("/api/relationship/to-block")
+                .content(asJsonString(requestSubcriber))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"));
+    }
+    @Test
+    public void testToBlockFailByEmailEmpty() throws Exception{
+        Relationship relationship =new Relationship();
+        User user1 = new User("");
+        User user2 = new User("");
         RequestSubcriber requestSubcriber = new RequestSubcriber(user1.getEmail(), user2.getEmail());
 
         when(relationshipService.toBlock(user1.getEmail(), user2.getEmail())).thenReturn(relationship);
@@ -328,6 +494,38 @@ public class RelationshipControllerTest {
         String text = "newmooncs1u";
         List<String> listReceiveUpload = new ArrayList<>();
         listReceiveUpload.add("newmooncsu");
+        RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail(),text);
+
+        when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);
+        MvcResult result = mockMvc.perform(post("/api/relationship/receive-update")
+                .content(asJsonString(requestReciveUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json")).andReturn();
+        String content = result.getResponse().getContentAsString();
+    }
+    @Test
+    public void testReceiveUpdateFailByEmailNull() throws Exception{
+        User user = new User("");
+        String text = "newmooncs1u";
+        List<String> listReceiveUpload = new ArrayList<>();
+        listReceiveUpload.add(null);
+        RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(null,text);
+
+        when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);
+        MvcResult result = mockMvc.perform(post("/api/relationship/receive-update")
+                .content(asJsonString(requestReciveUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json")).andReturn();
+        String content = result.getResponse().getContentAsString();
+    }
+    @Test
+    public void testReceiveUpdateFailByEmailEmpty() throws Exception{
+        User user = new User("");
+        String text = "newmooncs1u";
+        List<String> listReceiveUpload = new ArrayList<>();
+        listReceiveUpload.add("");
         RequestReciveUpdate requestReciveUpdate = new RequestReciveUpdate(user.getEmail(),text);
 
         when(relationshipService.findReceiveUpdateList(user.getEmail(),text)).thenReturn(listReceiveUpload);

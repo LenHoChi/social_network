@@ -15,9 +15,4 @@ public interface UserService {
     UserDTO saveUser(UserDTO userDTO) throws Exception;
 
     Map<String, Boolean> deleteUser(String userId) throws Exception;
-
-    void testTransactionalException() throws Exception;
-    void testTransactionalNoException() throws Exception;
-    void testTransactionalReadOnly() throws Exception;
-    void testTransactional() throws Exception;
 }

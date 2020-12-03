@@ -31,9 +31,6 @@ public class SocialNetworkApplication implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
-        List<String> lst = new ArrayList<>();
-        lst.add("len");
-        lst.add("len2");
-        lst.stream().map(e-> e.toUpperCase()).forEach(System.out::println);
+        System.out.println("hello spring");
     }
 }

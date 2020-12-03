@@ -33,13 +33,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDTO> findUserById(String id) throws Exception {
         return Optional.of(usersRepository.findById(id).map(UserConvert::convertModelToDTO).orElseThrow(() -> new Exception("Error not found")));
-
-//        if(usersRepository.findById(id).isPresent()){
-//            return Optional.ofNullable(UserConvert.modelToDTO(usersRepository.findById(id).get()));
-//        }else{
-//            throw new Exception("error");
-////            throw new NoSuchFieldException();
-//        }
     }
 
     private boolean checkSimilar(String email) {
@@ -51,9 +44,6 @@ public class UserServiceImpl implements UserService {
         }
         return true;
     }
-
-    //---> kết luận @valid chỉ xài cho input
-    //còn @email đặt ở model thì gọi khi save nhung no ko bug ra loi trong message
     @Override
     public UserDTO saveUser(UserDTO userDTO) throws Exception {
         if (checkSimilar(userDTO.getEmail())) {
@@ -74,69 +64,5 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new Exception("error (cause this email not exists)");
         }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//-------------test transaction-----------------------------------------------------------------------
-    @Override
-    public void testTransactionalException() throws Exception {
-        User user1 = new User("zoombiev1@gmail.com");
-        User user2 = new User("zoombiev2@gmail.com");
-        usersRepository.save(user1);
-        usersRepository.save(user2);
-        this.demoException();
-
-//        usersRepository.deleteById(user1.getEmail());
-//        usersRepository.deleteById(user2.getEmail());
-//        usersRepository.deleteById(user1.getEmail());
-    }
-
-    @Override
-    public void testTransactionalNoException() throws Exception {
-        User user1 = new User("zoombiev1@gmail.com");
-        User user2 = new User("zoombiev2@gmail.com");
-        usersRepository.save(user1);
-        usersRepository.save(user2);
-        this.demoException();
-    }
-
-    @Override
-    public void testTransactionalReadOnly() throws Exception {
-        User user1 = new User("zoombiev1@gmail.com");
-        User user2 = new User("zoombiev2@gmail.com");
-        usersRepository.save(user1);
-        usersRepository.save(user2);
-        usersRepository.save(user2);
-    }
-
-    @Override
-    public void testTransactional() throws Exception {
-//        Optional<User> user = usersRepository.findById("zoombiev1@gmail.com");
-//        user.get().setEmail("len@gmail.com");
-//        usersRepository.save(user.get());
-
-        User user1 = new User("zoombiev1@gmail.com");
-        User user2 = new User("zoombiev2@gmail.com");
-        usersRepository.save(user1);
-        usersRepository.save(user2);
-        this.demoException();
-    }
-
-    public void demoException() throws Exception {
-        throw new Exception("demo throw exception");
-       //throw new Error("df");
-        //throw new RuntimeException("dfdfd");
-
     }
 }

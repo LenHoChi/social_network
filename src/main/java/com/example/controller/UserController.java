@@ -18,7 +18,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     @GetMapping("")
-    @Secured("ROLE_USER")
+    //@Secured("ROLE_ADMIN")
     public ResponseEntity<?> findAllUsers(){
         List<UserDTO> listUserDTO = userService.findAllUsers();
         if(listUserDTO.isEmpty()){
@@ -39,10 +39,5 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findUserById(@PathVariable(value = "id") String id) throws Exception {
         return ResponseEntity.ok(userService.findUserById(id));
-    }
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/len")
-    public ResponseEntity<?> testTransactional() throws Exception {
-        return ResponseEntity.ok("true");
     }
 }

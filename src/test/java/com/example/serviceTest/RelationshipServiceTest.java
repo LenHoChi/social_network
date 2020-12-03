@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@ContextConfiguration(classes = TestRepositoryConfig.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class RelationshipServiceTest {
     @MockBean

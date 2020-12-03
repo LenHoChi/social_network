@@ -1,11 +1,9 @@
 package com.example.utils.convert;
 
-import com.example.dto.RelationshipDTO;
 import com.example.dto.UserDTO;
 import com.example.model.User;
 import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,6 @@ public class UserConvert {
     }
     public static List<UserDTO> convertListModelToListDTO(List<User> listUser){
         return listUser.stream().map(ele -> modelMapper.map(ele, UserDTO.class)).collect(Collectors.toList());
-        //return listUser.stream().map(UserConvert::convertModelToDTO).collect(Collectors.toList());
     }
     public static User convertDTOToModel(UserDTO userDTO){
         User user = modelMapper.map(userDTO, User.class);
