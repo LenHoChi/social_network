@@ -18,7 +18,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     @GetMapping("")
-    //@Secured("ROLE_ADMIN")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<?> findAllUsers(){
         List<UserDTO> listUserDTO = userService.findAllUsers();
         if(listUserDTO.isEmpty()){
