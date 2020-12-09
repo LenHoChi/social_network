@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -59,7 +60,7 @@ public class RelationshipControllerTest {
             throw new RuntimeException(e);
         }
     }
-
+    @WithMockUser(username = "len", password = "abc", roles = {"ADMIN"})
     @Test
     public void testGetAllRelationships() throws Exception {
         RelationshipPK relationshipPK = new RelationshipPK("len1", "len10");
@@ -103,6 +104,8 @@ public class RelationshipControllerTest {
         mockMvc.perform(post("/api/relationship/find-relationship-by-id")
                 .content(asJsonString(relationshipPK))
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errors[0]", is("error email")))
+                .andExpect(jsonPath("$.errors[1]", is("error email")))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"));
     }
@@ -143,6 +146,7 @@ public class RelationshipControllerTest {
                 .content(asJsonString(requestFriends))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(content().contentType("application/json"));
         verify(relationshipService, times(1)).beFriends(user1.getEmail(), user2.getEmail());
         verifyNoMoreInteractions(relationshipService);
@@ -211,6 +215,7 @@ public class RelationshipControllerTest {
         mockMvc.perform(post("/api/relationship/friends-list")
                 .content(asJsonString(requestFriendsList))
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.friends[0]",is("newmooncsu@gmail.com")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
         verify(relationshipService, times(1)).findFriendsList(requestFriendsList.getEmail());
